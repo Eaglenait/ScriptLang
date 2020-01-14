@@ -1,6 +1,5 @@
 ﻿using LangScriptCompilateur.Models;
 using System;
-using System;
 
 namespace LangScriptCompilateur
 {
@@ -18,17 +17,21 @@ namespace LangScriptCompilateur
                 string depth = "";
                 foreach (var token in lexer.Tokens)
                 {
-                    if (token.Signature == Signature.LBRACE)
-                        depth += ".";
+                    switch (token.Signature) {
+                        case Signature.LBRACKET:
+                        case Signature.LPAREN:
+                            depth += ".";
+                            break;
 
-                    if (token.Signature == Signature.RBRACE)
-                        depth.Remove(0, 1);
+                        case Signature.RBRACKET:
+                        case Signature.RPAREN:
+                            depth.Remove(0, 1);
+                            break;
+                    }
 
                     Console.WriteLine(string.Format("{0}{1} - {2}", depth, token.Word, token.Signature.ToString()));
                 }
-            }
-            else
-            {
+            } else {
                 foreach (var log in KompilationLogger.Instance.Log)
                 {
                     Console.WriteLine(string.Format("{0} - {1}", log.Item2, log.Item1));

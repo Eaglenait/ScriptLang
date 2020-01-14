@@ -21,12 +21,6 @@ namespace LangScriptCompilateur
             Logger.Log.Clear();
         }
 
-        private enum HandleWordRangeReturn
-        {
-            VALID,
-            INVALID,
-        }
-
         public bool Execute()
         {
             Tokens = new List<Token>();
@@ -92,10 +86,46 @@ namespace LangScriptCompilateur
                     case '.':
                         Tokens.Add(new Token() { Signature = Signature.OP_DOT });
                         break;
+                    case '>':
+                            if(Script[i+1] == '=') 
+                            {
+                                Tokens.Add(new Token() {
+                                    Signature = Signature.OP_GREATER_THAN_OR_EQUALS
+                                });
+
+                                i++;
+                            }
+                            else
+                            {
+                                Tokens.Add(new Token() {
+                                    Signature = Signature.OP_GREATER_THAN
+                                });
+                            }
+                        break;
+
+                    case '<':
+                        if (IsNextIndexValid(i)) 
+                        {
+                            if(Script[i+1] == '=') 
+                            {
+                                Tokens.Add(new Token() {
+                                    Signature = Signature.OP_LESS_THAN_OR_EQUALS
+                                });
+
+                                i++;
+                            }
+                            else
+                            {
+                                Tokens.Add(new Token() {
+                                    Signature = Signature.OP_LESS_THAN
+                                });
+                            }
+                        }
+                        break;
                     case '+':
                         if (IsNextIndexValid(i))
                         {
-                            switch (Script[i + 1])
+                            switch (Script[i])
                             {
                                 case '+':
                                     Tokens.Add(new Token() { Signature = Signature.OP_INCREMENT });
@@ -114,7 +144,7 @@ namespace LangScriptCompilateur
                     case '-':
                         if (IsNextIndexValid(i))
                         {
-                            switch (Script[i + 1])
+                            switch (Script[i])
                             {
                                 case '-':
                                     Tokens.Add(new Token() { Signature = Signature.OP_DECREMENT });
@@ -133,7 +163,7 @@ namespace LangScriptCompilateur
                     case '=':
                         if (IsNextIndexValid(i))
                         {
-                            if (Script[i + 1] == '=')
+                            if (Script[i] == '=')
                             {
                                 Tokens.Add(new Token() { Signature = Signature.OP_EQUALS });
                                 break;
@@ -334,7 +364,7 @@ namespace LangScriptCompilateur
                         Word = identifier.ToString(),
                         Signature = s
                     });
-                    return j + 1;
+                    return j;
                 }
             }
             return -1;

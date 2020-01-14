@@ -10,7 +10,7 @@ namespace ScriptLangConsole
         {
             //if (args.Length == 0) return;
 
-            string path = @"C:\Users\Sebastian\Documents\script.sc";
+            string path = @"C:\Users\Thor\Documents\script.sc";
             //var fs = new FileStream(args[0], FileMode.Open);
             var fs = new FileStream(path, FileMode.Open);
 
