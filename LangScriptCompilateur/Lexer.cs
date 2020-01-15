@@ -1,5 +1,6 @@
 ﻿using LangScriptCompilateur.Models;
 using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Text;
 
@@ -47,6 +48,7 @@ namespace LangScriptCompilateur
 
             if (!AreOpenCloseStatementsPaired()) return;
 
+
             for (int i = 0; i < Script.Length; i++)
             {
                 switch (Script[i])
@@ -87,13 +89,13 @@ namespace LangScriptCompilateur
                         Tokens.Add(new Token() { Signature = Signature.OP_DOT });
                         break;
                     case '>':
-                            if(Script[i+1] == '=') 
+                            if(Script[i + 1] == '=') 
                             {
                                 Tokens.Add(new Token() {
                                     Signature = Signature.OP_GREATER_THAN_OR_EQUALS
                                 });
 
-                                i++;
+                                i += 2;
                             }
                             else
                             {
@@ -112,7 +114,7 @@ namespace LangScriptCompilateur
                                     Signature = Signature.OP_LESS_THAN_OR_EQUALS
                                 });
 
-                                i++;
+                                i += 2;
                             }
                             else
                             {
@@ -125,15 +127,15 @@ namespace LangScriptCompilateur
                     case '+':
                         if (IsNextIndexValid(i))
                         {
-                            switch (Script[i])
+                            switch (Script[i + 1])
                             {
                                 case '+':
                                     Tokens.Add(new Token() { Signature = Signature.OP_INCREMENT });
-                                    i++;
+                                    i += 2;
                                     break;
                                 case '=':
                                     Tokens.Add(new Token() { Signature = Signature.OP_PLUS_ASSIGN });
-                                    i++;
+                                    i += 2;
                                     break;
                                 default:
                                     Tokens.Add(new Token() { Signature = Signature.OP_PLUS });
@@ -144,15 +146,15 @@ namespace LangScriptCompilateur
                     case '-':
                         if (IsNextIndexValid(i))
                         {
-                            switch (Script[i])
+                            switch (Script[i + 1])
                             {
                                 case '-':
                                     Tokens.Add(new Token() { Signature = Signature.OP_DECREMENT });
-                                    i++;
+                                    i += 2;
                                     break;
                                 case '=':
                                     Tokens.Add(new Token() { Signature = Signature.OP_MINUS_ASSIGN });
-                                    i++;
+                                    i += 2;
                                     break;
                                 default:
                                     Tokens.Add(new Token() { Signature = Signature.OP_MINUS });
@@ -163,7 +165,7 @@ namespace LangScriptCompilateur
                     case '=':
                         if (IsNextIndexValid(i))
                         {
-                            if (Script[i] == '=')
+                            if (Script[i + 1] == '=')
                             {
                                 Tokens.Add(new Token() { Signature = Signature.OP_EQUALS });
                                 break;
@@ -175,9 +177,10 @@ namespace LangScriptCompilateur
                     case '!':
                         if (IsNextIndexValid(i))
                         {
-                            if (Script[i] == '=')
+                            if (Script[i + 1] == '=')
                             {
                                 Tokens.Add(new Token() { Signature = Signature.OP_NOTEQUALS });
+                                break;
                             }
                         }
 
@@ -188,15 +191,14 @@ namespace LangScriptCompilateur
                         {
                             if (Script[i + 1] == '&')
                             {
-                                Tokens.Add(new Token() { Signature = Signature.OP_OR });
-                                i++;
+                                Tokens.Add(new Token() { Signature = Signature.OP_AND });
+                                i += 2;
                             }
                             else
                             {
                                 Logger.LogFatal("Invalid symbol");
                             }
                         }
-                        Tokens.Add(new Token() { Signature = Signature.OP_AND });
                         break;
                     case '|':
                         if (IsNextIndexValid(i))
@@ -204,7 +206,7 @@ namespace LangScriptCompilateur
                             if (Script[i + 1] == '|')
                             {
                                 Tokens.Add(new Token() { Signature = Signature.OP_OR });
-                                i++;
+                                i += 2;
                             }
                             else
                             {
@@ -216,12 +218,14 @@ namespace LangScriptCompilateur
                         var word = new StringBuilder();
                         for (int j = i + 1; j < Script.Length; j++)
                         {
-                            word.Append(Script[j]);
-
                             if (Script[j] == '"')
                             {
                                 i = j + 1;
                                 break;
+                            }
+                            else 
+                            {
+                                word.Append(Script[j]);
                             }
                         }
 
