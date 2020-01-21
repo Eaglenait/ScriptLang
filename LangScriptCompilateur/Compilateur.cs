@@ -16,7 +16,7 @@ namespace LangScriptCompilateur
             {
                 foreach (var token in lexer.Tokens)
                 {
-                    Console.WriteLine(string.Format("{0} - {2}", token.Word, token.Signature.ToString()));
+                    Console.WriteLine(string.Format("{0} - {1}", token.Word, token.Signature.ToString()));
                 }
             } else {
                 foreach (var log in KompilationLogger.Instance.Log)
@@ -24,6 +24,8 @@ namespace LangScriptCompilateur
                     Console.WriteLine(string.Format("{0} - {1}", log.Item2, log.Item1));
                 }
             }
+
+            Console.WriteLine("Compile End");
         }
     }
 }
