@@ -1,5 +1,6 @@
 ﻿using LangScriptCompilateur.Models;
 using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Text;
 
@@ -47,6 +48,7 @@ namespace LangScriptCompilateur
 
             if (!AreOpenCloseStatementsPaired()) return;
 
+
             for (int i = 0; i < Script.Length; i++)
             {
                 switch (Script[i])
@@ -87,13 +89,13 @@ namespace LangScriptCompilateur
                         Tokens.Add(new Token() { Signature = Signature.OP_DOT });
                         break;
                     case '>':
-                            if(Script[i+1] == '=') 
+                            if(Script[i + 1] == '=')
                             {
                                 Tokens.Add(new Token() {
                                     Signature = Signature.OP_GREATER_THAN_OR_EQUALS
                                 });
 
-                                i++;
+                                i += 2;
                             }
                             else
                             {
@@ -104,15 +106,15 @@ namespace LangScriptCompilateur
                         break;
 
                     case '<':
-                        if (IsNextIndexValid(i)) 
+                        if (IsNextIndexValid(i))
                         {
-                            if(Script[i+1] == '=') 
+                            if(Script[i+1] == '=')
                             {
                                 Tokens.Add(new Token() {
                                     Signature = Signature.OP_LESS_THAN_OR_EQUALS
                                 });
 
-                                i++;
+                                i += 2;
                             }
                             else
                             {
@@ -125,15 +127,15 @@ namespace LangScriptCompilateur
                     case '+':
                         if (IsNextIndexValid(i))
                         {
-                            switch (Script[i])
+                            switch (Script[i + 1])
                             {
                                 case '+':
                                     Tokens.Add(new Token() { Signature = Signature.OP_INCREMENT });
-                                    i++;
+                                    i += 2;
                                     break;
                                 case '=':
                                     Tokens.Add(new Token() { Signature = Signature.OP_PLUS_ASSIGN });
-                                    i++;
+                                    i += 2;
                                     break;
                                 default:
                                     Tokens.Add(new Token() { Signature = Signature.OP_PLUS });
@@ -144,15 +146,15 @@ namespace LangScriptCompilateur
                     case '-':
                         if (IsNextIndexValid(i))
                         {
-                            switch (Script[i])
+                            switch (Script[i + 1])
                             {
                                 case '-':
                                     Tokens.Add(new Token() { Signature = Signature.OP_DECREMENT });
-                                    i++;
+                                    i += 2;
                                     break;
                                 case '=':
                                     Tokens.Add(new Token() { Signature = Signature.OP_MINUS_ASSIGN });
-                                    i++;
+                                    i += 2;
                                     break;
                                 default:
                                     Tokens.Add(new Token() { Signature = Signature.OP_MINUS });
@@ -163,40 +165,51 @@ namespace LangScriptCompilateur
                     case '=':
                         if (IsNextIndexValid(i))
                         {
-                            if (Script[i] == '=')
+                            if (Script[i + 1] == '=')
                             {
                                 Tokens.Add(new Token() { Signature = Signature.OP_EQUALS });
+                                i += 2;
                                 break;
+                            }
+                            else
+                            {
+                                Tokens.Add(new Token() { Signature = Signature.OP_ASSIGN });
                             }
                         }
 
-                        Tokens.Add(new Token() { Signature = Signature.OP_ASSIGN });
                         break;
                     case '!':
                         if (IsNextIndexValid(i))
                         {
-                            if (Script[i] == '=')
+                            if (Script[i + 1] == '=')
                             {
                                 Tokens.Add(new Token() { Signature = Signature.OP_NOTEQUALS });
+                                i += 2;
+                                break;
+                            }
+                            else
+                            {
+                                Tokens.Add(new Token() { Signature = Signature.OP_NOT });
                             }
                         }
 
-                        Tokens.Add(new Token() { Signature = Signature.OP_NOT });
                         break;
                     case '&':
                         if (IsNextIndexValid(i))
                         {
                             if (Script[i + 1] == '&')
                             {
-                                Tokens.Add(new Token() { Signature = Signature.OP_OR });
-                                i++;
+                                Tokens.Add(new Token() { Signature = Signature.OP_AND });
+                                Console.WriteLine("returns at: "+ (i+2) + " char: " + Script[i+2]);
+                                i += 2;
+                                break;
                             }
                             else
                             {
                                 Logger.LogFatal("Invalid symbol");
+                                return;
                             }
                         }
-                        Tokens.Add(new Token() { Signature = Signature.OP_AND });
                         break;
                     case '|':
                         if (IsNextIndexValid(i))
@@ -204,11 +217,13 @@ namespace LangScriptCompilateur
                             if (Script[i + 1] == '|')
                             {
                                 Tokens.Add(new Token() { Signature = Signature.OP_OR });
-                                i++;
+                                i += 2;
+                                break;
                             }
                             else
                             {
                                 Logger.LogFatal("Invalid symbol");
+                                return;
                             }
                         }
                         break;
@@ -216,12 +231,14 @@ namespace LangScriptCompilateur
                         var word = new StringBuilder();
                         for (int j = i + 1; j < Script.Length; j++)
                         {
-                            word.Append(Script[j]);
-
                             if (Script[j] == '"')
                             {
                                 i = j + 1;
                                 break;
+                            }
+                            else
+                            {
+                                word.Append(Script[j]);
                             }
                         }
 
@@ -235,7 +252,9 @@ namespace LangScriptCompilateur
                         if (char.IsDigit(Script[i]))
                         {
                             int numberScanResult = ScanNumber(i);
-                            if (numberScanResult == -1)
+
+                            if (numberScanResult >= Script.Length
+                             || numberScanResult == -1)
                             {
                                 return;
                             }
@@ -247,7 +266,7 @@ namespace LangScriptCompilateur
                         else if (char.IsLetter(Script[i]))
                         {
                             int identifierScanResult = ScanIdentifier(i);
-                            if (identifierScanResult == -1)
+                            if (identifierScanResult >= Script.Length)
                             {
                                 return;
                             }
@@ -335,7 +354,8 @@ namespace LangScriptCompilateur
                                 Signature = s
                             });
 
-                            return j + 1;
+                            Console.WriteLine("ScanNumber returns: " + (j) + " char: " + Script[j]);
+                            return j;
                         }
                         else
                         {
@@ -344,13 +364,14 @@ namespace LangScriptCompilateur
                 }
             }
 
-            return 0;
+            return -1;
         }
 
         private int ScanIdentifier(int i)
         {
             var identifier = new StringBuilder();
-            for (int j = i; j < Script.Count(); j++)
+            int j = 0;
+            for (j = i; j < Script.Length; j++)
             {
                 if (char.IsLetterOrDigit(Script[j]))
                 {
@@ -358,16 +379,17 @@ namespace LangScriptCompilateur
                 }
                 else
                 {
-                    Signature s = IdentifyIdentifier(identifier.ToString());
-                    Tokens.Add(new Token()
-                    {
-                        Word = identifier.ToString(),
-                        Signature = s
-                    });
-                    return j;
+                    break;
                 }
             }
-            return -1;
+
+            Signature s = IdentifyIdentifier(identifier.ToString());
+            Tokens.Add(new Token()
+            {
+                Word = identifier.ToString(),
+                Signature = s
+            });
+            return j - 1;
         }
 
         private Signature IdentifyIdentifier(string identifier)
@@ -416,8 +438,13 @@ namespace LangScriptCompilateur
 
         private bool IsNextIndexValid(int i)
         {
-            if (i > Script.Length) return false;
-            if ((i + 1) > Script.Length) return false;
+            //if (i > Script.Length) return false;
+            if ((i + 1) > Script.Length
+                    || i > Script.Length)
+            {
+                return false;
+            }
+
 
             return true;
         }
