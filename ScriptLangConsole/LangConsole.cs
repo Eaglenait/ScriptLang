@@ -8,9 +8,6 @@ namespace ScriptLangConsole
     {
         static void Main(string[] args)
         {
-            //if (args.Length == 0) return;
-
-            //string path = @"C:\Users\Thor\Documents\script.sc";
             string path = @"..\scripts\script.sc";
             //var fs = new FileStream(args[0], FileMode.Open);
             var fs = new FileStream(path, FileMode.Open);
