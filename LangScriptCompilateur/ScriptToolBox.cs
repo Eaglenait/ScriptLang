@@ -25,7 +25,6 @@ namespace LangScriptCompilateur
         }
 
 
-
         public static IEnumerable<string> PrimitiveTypeNames()
         {
             yield return "string";

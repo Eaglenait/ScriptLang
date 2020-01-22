@@ -131,11 +131,11 @@ namespace LangScriptCompilateur
                             {
                                 case '+':
                                     Tokens.Add(new Token() { Signature = Signature.OP_INCREMENT });
-                                    i += 2;
+                                    i += 1;
                                     break;
                                 case '=':
                                     Tokens.Add(new Token() { Signature = Signature.OP_PLUS_ASSIGN });
-                                    i += 2;
+                                    i += 1;
                                     break;
                                 default:
                                     Tokens.Add(new Token() { Signature = Signature.OP_PLUS });
@@ -150,11 +150,11 @@ namespace LangScriptCompilateur
                             {
                                 case '-':
                                     Tokens.Add(new Token() { Signature = Signature.OP_DECREMENT });
-                                    i += 2;
+                                    i += 1;
                                     break;
                                 case '=':
                                     Tokens.Add(new Token() { Signature = Signature.OP_MINUS_ASSIGN });
-                                    i += 2;
+                                    i += 1;
                                     break;
                                 default:
                                     Tokens.Add(new Token() { Signature = Signature.OP_MINUS });
@@ -168,7 +168,12 @@ namespace LangScriptCompilateur
                             if (Script[i + 1] == '=')
                             {
                                 Tokens.Add(new Token() { Signature = Signature.OP_EQUALS });
-                                i += 2;
+                                i += 1;
+                                if (IsNextIndexValid(i))
+                                    if (char.IsWhiteSpace(Script[i + 1]))
+                                    {
+                                        i += 1;
+                                    }
                                 break;
                             }
                             else
@@ -184,7 +189,7 @@ namespace LangScriptCompilateur
                             if (Script[i + 1] == '=')
                             {
                                 Tokens.Add(new Token() { Signature = Signature.OP_NOTEQUALS });
-                                i += 2;
+                                i += 1;
                                 break;
                             }
                             else
@@ -201,7 +206,7 @@ namespace LangScriptCompilateur
                             {
                                 Tokens.Add(new Token() { Signature = Signature.OP_AND });
                                 Console.WriteLine("returns at: "+ (i+2) + " char: " + Script[i+2]);
-                                i += 2;
+                                i += 1;
                                 break;
                             }
                             else
@@ -217,7 +222,7 @@ namespace LangScriptCompilateur
                             if (Script[i + 1] == '|')
                             {
                                 Tokens.Add(new Token() { Signature = Signature.OP_OR });
-                                i += 2;
+                                i += 1;
                                 break;
                             }
                             else
@@ -401,7 +406,7 @@ namespace LangScriptCompilateur
 
             switch (identifier)
             {
-                case "if'":
+                case "if":
                     return Signature.KW_IF;
                 case "else":
                     return Signature.KW_ELSE;

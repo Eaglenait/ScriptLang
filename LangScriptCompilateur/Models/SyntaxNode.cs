@@ -1,6 +1,10 @@
-﻿namespace LangScriptCompilateur.Models
+﻿using System.Collections.Generic;
+
+namespace LangScriptCompilateur.Models
 {
-    class SyntaxNode
+    public class SyntaxNode
     {
+        public SyntaxNode Parent { get; set; }
+        public List<SyntaxNode> Childrens { get; set; }
     }
 }

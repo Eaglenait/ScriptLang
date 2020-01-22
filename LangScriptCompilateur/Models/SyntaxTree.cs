@@ -6,5 +6,6 @@ namespace LangScriptCompilateur.Models
 {
     public class SyntaxTree
     {
+        List<SyntaxNode> AbstractSyntaxTree { get; set; }
     }
 }
