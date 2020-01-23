@@ -4,8 +4,9 @@ using System.Text;
 
 namespace LangScriptCompilateur.Models.Enums
 {
-    enum OperationType
+    public enum OperationType
     {
+        NONE,
         ASSIGNATION,
         DECLARATION,
         RETURN,

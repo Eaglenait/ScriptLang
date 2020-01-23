@@ -74,6 +74,10 @@ namespace LangScriptCompilateur.Models
         public SyntaxNode Get(params int[] coords)
         {
             SyntaxNode syntaxNode = new SyntaxNode();
+            if(coords.Length == 1)
+            {
+                return TreeRoot.Childrens[CurrentNode[coords[0]]];
+            }
             for (int i = 0; i < coords.Length; i++)
             {
                 syntaxNode = TreeRoot.Childrens[coords[i]]; 
@@ -84,6 +88,12 @@ namespace LangScriptCompilateur.Models
         public void Add(SyntaxNode node, params int[] coords)
         {
             SyntaxNode syntaxNode = new SyntaxNode();
+            if(coords.Length == 1)
+            {
+                TreeRoot.Childrens.Add(node);
+                return;
+            }
+
             for (int i = 0; i < coords.Length; i++)
             {
                 syntaxNode = TreeRoot.Childrens[i];

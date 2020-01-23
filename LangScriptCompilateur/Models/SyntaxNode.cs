@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using LangScriptCompilateur.Models.Enums;
+using System.Collections.Generic;
 
 namespace LangScriptCompilateur.Models
 {
     public class SyntaxNode
     {
+        public OperationType OperationType { get; set; }
         public SyntaxNode Parent { get; set; }
         public List<SyntaxNode> Childrens { get; set; } = new List<SyntaxNode>();
+
         public bool HasChildrens
         {
             get

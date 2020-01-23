@@ -4,8 +4,8 @@ using System.Text;
 
 namespace LangScriptCompilateur.Models.Nodes
 {
-    public class ReturnNode<T> : SyntaxNode
+    public class ReturnNode : SyntaxNode
     {
-        T Value { get; set; }
-    }
+        public TypesEnum Type { get; set; }
+        public object Value { get; set; }
 }

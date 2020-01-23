@@ -1,4 +1,5 @@
 ﻿using LangScriptCompilateur.Models;
+using LangScriptCompilateur.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,22 +10,9 @@ namespace LangScriptCompilateur.Parsers
     {
         private List<Delegate> Rules { get; set; } = new List<Delegate>();
 
-        public bool Execute(List<Token> tokens)
+        public (OperationType, SyntaxNode) Execute()
         {
-            foreach (var rule in Rules)
-            {
-            }
-            return false;
-        }
-
-        public void AddRule(Delegate rule)
-        {
-            Rules.Add(rule);
-        }
-
-        public List<Delegate> GetParseRules()
-        {
-            throw new NotImplementedException();
+            return (OperationType.NONE, null);
         }
     }
 }

@@ -12,21 +12,11 @@ namespace ScriptCompilateurTests
         [Test]
         public void HasChildrens()
         {
-            Parser parser = new Parser();
-
-            List<SyntaxNode> syntaxNodes = new List<SyntaxNode>()
-            {
-                new SyntaxNode()
-                {
-                    Childrens = new List<SyntaxNode>()
-                    {
-                        new SyntaxNode(),
-                        new SyntaxNode()
-                    }
-                }
+            List<Token> tokens = new List<Token> {
+                new Token{ Signature = Signature.KW_RETURN},
+                new Token{ Signature = Signature.END}
             };
-            
-            SyntaxTree tree = parser.ParseAST(syntaxNodes);
+            SyntaxTree tree = new Parser().ParseAST(tokens);
             Assert.IsTrue(tree.TreeRoot.HasChildrens);
         }
     }
