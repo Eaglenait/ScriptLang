@@ -2,11 +2,6 @@
 
 namespace LangScriptCompilateur.Models
 {
-    public class SyntaxNode<T>
-    {
-        T Type { get; set; }
-    }
-
     public class SyntaxNode
     {
         public SyntaxNode Parent { get; set; }

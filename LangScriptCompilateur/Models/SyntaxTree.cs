@@ -7,7 +7,7 @@ namespace LangScriptCompilateur.Models
 {
     public class SyntaxTree
     {
-        SyntaxNode TreeRoot { get; set; }
+        public SyntaxNode TreeRoot { get; private set; }
         List<int> CurrentNode { get; set; }
 
         public SyntaxTree()
