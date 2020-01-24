@@ -7,6 +7,6 @@ namespace LangScriptCompilateur
 {
     public interface IParseRule
     {
-        (OperationType, SyntaxNode) Execute();
+        SyntaxNode Execute();
     }
 }

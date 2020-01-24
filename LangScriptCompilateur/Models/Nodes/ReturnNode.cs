@@ -8,4 +8,5 @@ namespace LangScriptCompilateur.Models.Nodes
     {
         public TypesEnum Type { get; set; }
         public object Value { get; set; }
+    }
 }

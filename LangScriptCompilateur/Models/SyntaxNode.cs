@@ -5,10 +5,15 @@ namespace LangScriptCompilateur.Models
 {
     public class SyntaxNode
     {
-        public OperationType OperationType { get; set; }
+        public OperationType NodeType { get; set; }
         public SyntaxNode Parent { get; set; }
         public List<SyntaxNode> Childrens { get; set; } = new List<SyntaxNode>();
 
+        public static SyntaxNode None(){
+            return new SyntaxNode() {
+                NodeType = OperationType.NONE
+            };
+        }
         public bool HasChildrens
         {
             get

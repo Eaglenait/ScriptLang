@@ -1,10 +1,8 @@
-﻿using LangScriptCompilateur.Models;
+﻿using System;
+using LangScriptCompilateur.Models;
 using LangScriptCompilateur.Models.Enums;
-using LangScriptCompilateur.Models.Nodes;
 using LangScriptCompilateur.Parsers;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace LangScriptCompilateur
 {
@@ -19,19 +17,31 @@ namespace LangScriptCompilateur
             {
                 if (node.Signature != Signature.END)
                 {
-                    subList.Add(node);    
+                    subList.Add(node);
                 }
                 else
                 {
                     subList.Add(new Token { Signature = Signature.END });
-                    var generic = new GenericRules(subList).Execute();
-                    if (generic.Item1 != OperationType.NONE)
-                    {
-                        if (generic.Item1 == OperationType.RETURN)
-                        {
-                            parsedTree.AddChild(generic.Item2);
+                    SyntaxNode generic = new GenericRules(subList).Execute();
+
+                    subList = new List<Token>();
+
+                    switch(generic.NodeType) {
+                        default:
+                        case OperationType.NONE:
+                        case OperationType.PARENT:
+                        case OperationType.ASSIGNATION:
+                        case OperationType.DECLARATION:
+                        case OperationType.BLOCK:
+                        case OperationType.VARIABLE:
+                        case OperationType.CONST:
+                            break;
+
+                        case OperationType.RETURN:
+                            Console.WriteLine("Add ReturnNode");
+                            parsedTree.AddChild(generic);
                             parsedTree.GoCurrentParent();
-                        }
+                            break;
                     }
                 }
             }

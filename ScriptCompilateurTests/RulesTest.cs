@@ -21,12 +21,10 @@ namespace ScriptCompilateurTests
             };
 
             GenericRules gr = new GenericRules(tokens);
-            (OperationType, SyntaxNode) operationResult = gr.Execute();
+            SyntaxNode operationResult = gr.Execute();
 
-            Assert.AreEqual(operationResult.Item1, OperationType.RETURN);
-            Assert.IsTrue(operationResult.Item2 is ReturnNode);
-            var result = operationResult.Item2 as ReturnNode;
-            Assert.AreEqual(result.Type.ToString(), TypesEnum.VOID.ToString());
+            Assert.AreEqual(operationResult.NodeType, OperationType.RETURN);
+            Assert.IsTrue(operationResult is ReturnNode);
         }
     }
 }

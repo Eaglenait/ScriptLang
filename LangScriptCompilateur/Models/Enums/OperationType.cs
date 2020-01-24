@@ -7,6 +7,7 @@ namespace LangScriptCompilateur.Models.Enums
     public enum OperationType
     {
         NONE,
+        PARENT,
         ASSIGNATION,
         DECLARATION,
         RETURN,

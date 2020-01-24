@@ -1,8 +1,6 @@
 ﻿using LangScriptCompilateur;
+using LangScriptCompilateur.Models;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ScriptCompilateurTests
 {
@@ -14,7 +12,14 @@ namespace ScriptCompilateurTests
             string script = "return;";
             Lexer lexer = new Lexer(script);
 
+            foreach(var token in lexer.Tokens)
+            {
+                Console.WriteLine(token.Signature.ToString());
+            }
 
+            Parser p = new Parser();
+            SyntaxTree st = p.ParseAST(lexer.Tokens);
+            Assert.AreEqual(st.);
         }
     }
 }

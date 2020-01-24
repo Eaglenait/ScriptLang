@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
+using LangScriptCompilateur.Models.Enums;
 
 namespace LangScriptCompilateur.Models
 {
@@ -15,7 +16,8 @@ namespace LangScriptCompilateur.Models
             CurrentNode = new List<int> { 0 };
             TreeRoot = new SyntaxNode() {
                 Parent = null,
-                Childrens = new List<SyntaxNode>()
+                Childrens = new List<SyntaxNode>(),
+                NodeType = OperationType.PARENT
             };
         }
 
@@ -24,7 +26,6 @@ namespace LangScriptCompilateur.Models
         public void AddChild(SyntaxNode child)
         {
             Add(child, CurrentNode.ToArray());
-            CurrentNode.Add(0);
         }
 
         public List<SyntaxNode> GetChildrens()
@@ -33,7 +34,7 @@ namespace LangScriptCompilateur.Models
             for (int i = 0; i < CurrentNode.Count; i++)
             {
 
-               syntaxNode = TreeRoot.Childrens[CurrentNode[i]]; 
+               syntaxNode = TreeRoot.Childrens[CurrentNode[i]];
             }
 
             if (syntaxNode.HasChildrens)
@@ -55,12 +56,12 @@ namespace LangScriptCompilateur.Models
                 CurrentNode.RemoveAt(CurrentNode.Count - 1);
 
                 return Get(CurrentNode.ToArray());
-            } 
+            }
             else
             {
                 GoRootParentAccess++;
                 if (GoRootParentAccess > 2) throw new Exception("Multiple root access");
-                
+
                 return TreeRoot;
             }
         }
@@ -76,7 +77,7 @@ namespace LangScriptCompilateur.Models
             SyntaxNode syntaxNode = new SyntaxNode();
             if(coords.Length == 1)
             {
-                return TreeRoot.Childrens[CurrentNode[coords[0]]];
+                return TreeRoot.Childrens[coords[0]];
             }
             for (int i = 0; i < coords.Length; i++)
             {
