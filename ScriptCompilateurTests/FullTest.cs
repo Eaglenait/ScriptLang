@@ -1,6 +1,9 @@
 ﻿using LangScriptCompilateur;
 using LangScriptCompilateur.Models;
+using LangScriptCompilateur.Models.Enums;
+using LangScriptCompilateur.Models.Nodes;
 using NUnit.Framework;
+using System;
 
 namespace ScriptCompilateurTests
 {
@@ -11,6 +14,7 @@ namespace ScriptCompilateurTests
         {
             string script = "return;";
             Lexer lexer = new Lexer(script);
+            lexer.Execute();
 
             foreach(var token in lexer.Tokens)
             {
@@ -19,7 +23,9 @@ namespace ScriptCompilateurTests
 
             Parser p = new Parser();
             SyntaxTree st = p.ParseAST(lexer.Tokens);
-            Assert.AreEqual(st.);
+
+            ReturnNode returnNode = st.TreeRoot.Childrens[0] as ReturnNode;
+            Assert.AreEqual(TypesEnum.VOID, returnNode.Type);
         }
     }
 }

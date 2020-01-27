@@ -10,9 +10,11 @@ namespace LangScriptCompilateur.Models
     {
         public SyntaxNode TreeRoot { get; private set; }
         List<int> CurrentNode { get; set; }
+        private KompilationLogger _logger;
 
         public SyntaxTree()
         {
+            _logger = KompilationLogger.Instance;
             CurrentNode = new List<int> { 0 };
             TreeRoot = new SyntaxNode() {
                 Parent = null,
@@ -33,8 +35,7 @@ namespace LangScriptCompilateur.Models
             SyntaxNode syntaxNode = new SyntaxNode();
             for (int i = 0; i < CurrentNode.Count; i++)
             {
-
-               syntaxNode = TreeRoot.Childrens[CurrentNode[i]];
+                syntaxNode = TreeRoot.Childrens[CurrentNode[i]];
             }
 
             if (syntaxNode.HasChildrens)
@@ -55,52 +56,89 @@ namespace LangScriptCompilateur.Models
                 SyntaxNode node = new SyntaxNode();
                 CurrentNode.RemoveAt(CurrentNode.Count - 1);
 
-                return Get(CurrentNode.ToArray());
+                return Peek(CurrentNode.ToArray());
             }
             else
             {
                 GoRootParentAccess++;
-                if (GoRootParentAccess > 2) throw new Exception("Multiple root access");
+                if (GoRootParentAccess > 2)
+                {
+                    _logger.LogFatal("Multiple root access");
+                    throw new Exception("Multiple root access");
+                }
 
                 return TreeRoot;
             }
         }
 
-        public SyntaxNode Go(params int[] coords)
+        public void Go(params int[] coords)
         {
             CurrentNode = coords.ToList();
-            return Get(coords.ToArray());
         }
 
-        public SyntaxNode Get(params int[] coords)
+        public SyntaxNode Peek(params int[] coords)
         {
-            SyntaxNode syntaxNode = new SyntaxNode();
             if(coords.Length == 1)
             {
-                return TreeRoot.Childrens[coords[0]];
+                if (TreeRoot.Childrens.Count >= coords[0])
+                {
+                    return TreeRoot.Childrens[coords[0]];
+                }
+                else
+                {
+                    _logger.LogFatal("invalid syntaxTree retrieval coords: " + CoordsToString(coords));
+                    return null;
+                }
             }
+
+            SyntaxNode syntaxNode = TreeRoot;
             for (int i = 0; i < coords.Length; i++)
             {
-                syntaxNode = TreeRoot.Childrens[coords[i]]; 
+                syntaxNode = syntaxNode.Childrens[coords[i]]; 
             }
             return syntaxNode;
         }
 
         public void Add(SyntaxNode node, params int[] coords)
         {
-            SyntaxNode syntaxNode = new SyntaxNode();
             if(coords.Length == 1)
             {
+                if (coords[0] != TreeRoot.Childrens.Count) _logger.LogWarning("New Child coordinates mismatch");
                 TreeRoot.Childrens.Add(node);
                 return;
             }
 
+            SyntaxNode syntaxNode = TreeRoot;
             for (int i = 0; i < coords.Length; i++)
             {
-                syntaxNode = TreeRoot.Childrens[i];
+                if (i != coords.Length - 1)
+                {
+                    syntaxNode = syntaxNode.Childrens[i];
+                }
+                else
+                {
+                    //we can add the last child without correct coords
+                    //last coord is the index of the child in the last parent node 
+                    if (coords[0] != syntaxNode.Childrens.Count)
+                        _logger.LogWarning(string.Format("New Child coordinates mismatch lastidx:{0} tried:{1} actual {2}"
+                                                        , syntaxNode.Childrens.Count, coords[0], syntaxNode.Childrens.Count));
+                
+                    syntaxNode.Childrens.Add(node);
+                }
+            }
+        }
+
+        private string CoordsToString(IEnumerable<int> coords)
+        {
+            var strCoords = new StringBuilder();
+            foreach(int coord in coords)
+            {
+                strCoords.AppendFormat("{0}, ", coord.ToString());
             }
 
-            syntaxNode.Childrens.Add(node);
+            //Pop last ',' 
+            strCoords.Length--;
+            return strCoords.ToString();
         }
     }
 }

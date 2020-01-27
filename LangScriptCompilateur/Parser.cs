@@ -40,8 +40,7 @@ namespace LangScriptCompilateur
                         case OperationType.RETURN:
                             Console.WriteLine("Add ReturnNode");
                             parsedTree.AddChild(generic);
-                            parsedTree.GoCurrentParent();
-                            break;
+                            return parsedTree;
                     }
                 }
             }
