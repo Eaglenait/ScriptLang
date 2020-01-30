@@ -68,5 +68,8 @@ namespace LangScriptCompilateur.Models
 
         KW_FUNCTION_DECL,
         KW_ENUM_DECL,
+
+        KW_TRUE,
+        KW_FALSE,
     }
 }

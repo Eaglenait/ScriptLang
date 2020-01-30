@@ -238,7 +238,7 @@ namespace LangScriptCompilateur
                         {
                             if (Script[j] == '"')
                             {
-                                i = j + 1;
+                                i = j;
                                 break;
                             }
                             else
@@ -344,7 +344,7 @@ namespace LangScriptCompilateur
 
                     default:
                         if (!Script[j].IsMathOperator()
-                           || Script[j] != ';'
+                           || Script[j] == ';'
                            || char.IsWhiteSpace(Script[j]))
                         {
                             Signature s = Signature.I_CONST;
@@ -359,8 +359,7 @@ namespace LangScriptCompilateur
                                 Signature = s
                             });
 
-                            Console.WriteLine("ScanNumber returns: " + (j) + " char: " + Script[j]);
-                            return j;
+                            return j - 1;
                         }
                         else
                         {
@@ -436,6 +435,11 @@ namespace LangScriptCompilateur
                     return Signature.KW_FUNCTION_DECL;
                 case "enum":
                     return Signature.KW_ENUM_DECL;
+
+                case "true":
+                    return Signature.KW_TRUE;
+                case "false":
+                    return Signature.KW_FALSE;
             }
 
             return Signature.IDENTIFIER;
