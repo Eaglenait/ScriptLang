@@ -12,15 +12,18 @@ namespace ScriptCompilateurTests.LexerTests
         [Test]
         public void Assignation()
         {
-            List<List<Token>> tokens = new List<List<Token>>() {
+            List<List<Token>> tokens = new List<List<Token>>()
+            {
                 LexerTestBase.GetTokensForScript("int i = 0;"),
-                LexerTestBase.GetTokensForScript("float f = 1.22f;"),
-                LexerTestBase.GetTokensForScript(@"string s = ""test"";"),
+                    LexerTestBase.GetTokensForScript("float f = 1.22f;"),
+                    LexerTestBase.GetTokensForScript(@"string s = ""test"";")
+            };
 
-            List<List<Signature>> signatures = new List<List<Signature>> {
+            List<List<Signature>> signatures = new List<List<Signature>>
+            {
                 new List<Signature>(){TYPENAME, IDENTIFIER, OP_ASSIGN, I_CONST, END},
-                new List<Signature>(){TYPENAME, IDENTIFIER, OP_ASSIGN, F_CONST, END},
-                new List<Signature>(){TYPENAME, IDENTIFIER, OP_ASSIGN, STRINGLITTERAL, END}
+                    new List<Signature>(){TYPENAME, IDENTIFIER, OP_ASSIGN, F_CONST, END},
+                    new List<Signature>(){TYPENAME, IDENTIFIER, OP_ASSIGN, STRINGLITTERAL, END}
             };
 
             for(int i = 0; i < tokens.Count; i++)
