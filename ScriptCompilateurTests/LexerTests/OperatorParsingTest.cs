@@ -4,8 +4,7 @@ using ScriptCompilateurTests;
 using System.Collections.Generic;
 using System.Linq;
 
-
-namespace Tests
+namespace ScriptCompilateurTests.LexerTests
 {
     public class OperatorParsingTest
     {
