@@ -62,5 +62,6 @@
 
         KW_TRUE,
         KW_FALSE,
+        INVALID,
     }
 }

@@ -1,9 +1,27 @@
-﻿using System.Collections.Generic;
+﻿using LangScriptCompilateur.Models.Enums;
+using System.Collections.Generic;
 
 namespace LangScriptCompilateur
 {
     public static class ScriptToolbox
     {
+
+        /// <summary>
+        /// returns true if signature if an opening parenthesis bracket or curly bracket
+        /// </summary>
+        public static bool IsOpeningSignature(this Signature s)
+        {
+            switch (s)
+            {
+                case Signature.LBRACKET:
+                case Signature.LPAREN:
+                case Signature.LBRACE:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         public static bool IsPrimitiveType(this string s)
         {
             foreach (string typeName in PrimitiveTypeNames())
