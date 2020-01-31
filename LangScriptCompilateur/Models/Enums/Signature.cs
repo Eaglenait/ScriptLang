@@ -62,6 +62,12 @@
 
         KW_TRUE,
         KW_FALSE,
+
+        //Game Consts
+        CONST_SELF,
+        CONST_WORLD,
+        CONST_SCRIPT,
+
         INVALID,
     }
 }

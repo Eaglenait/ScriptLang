@@ -441,6 +441,13 @@ namespace LangScriptCompilateur
                     return Signature.KW_TRUE;
                 case "false":
                     return Signature.KW_FALSE;
+
+                case "World":
+                    return Signature.CONST_WORLD;
+                case "Self":
+                    return Signature.CONST_SELF;
+                case "Script":
+                    return Signature.CONST_SCRIPT;
             }
 
             return Signature.IDENTIFIER;

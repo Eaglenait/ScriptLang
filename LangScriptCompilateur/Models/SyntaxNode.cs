@@ -9,8 +9,6 @@ namespace LangScriptCompilateur.Models
         public SyntaxNode Parent { get; set; }
         public List<SyntaxNode> Childrens { get; set; } = new List<SyntaxNode>();
 
-        public static SyntaxNode None { get { return new SyntaxNode() { NodeType = OperationType.NONE}; } }
-
         public bool HasChildrens
         {
             get

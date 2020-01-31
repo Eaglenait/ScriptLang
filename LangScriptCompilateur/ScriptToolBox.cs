@@ -5,6 +5,22 @@ namespace LangScriptCompilateur
 {
     public static class ScriptToolbox
     {
+        public static bool IsStructuralKeyWord(this Signature s)
+        {
+            switch (s)
+            {
+                case Signature.KW_IF:
+                case Signature.KW_SWITCH:
+                case Signature.KW_WHILE:
+                case Signature.KW_FOR:
+                case Signature.KW_DO:
+                case Signature.KW_FUNCTION_DECL:
+                case Signature.KW_ENUM_DECL:
+                    return true;
+                default:
+                    return false;
+            }
+        }
 
         /// <summary>
         /// returns true if signature if an opening parenthesis bracket or curly bracket

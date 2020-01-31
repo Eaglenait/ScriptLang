@@ -30,9 +30,21 @@ namespace ScriptCompilateurTests.ParserTests
             List<ASTSubBlock> astSubBlocks = new List<ASTSubBlock>() {
                 new ASTSubBlock
                 {
+                    StartIndex = 0,
+                    EndIndex = 1,
+                    BlockType = Signature.UNKNOWN
+                },
+                new ASTSubBlock
+                {
                     StartIndex = 1,
                     EndIndex = 5,
                     BlockType = Signature.LPAREN
+                },
+                new ASTSubBlock
+                {
+                    StartIndex = 7,
+                    EndIndex = 9,
+                    BlockType = Signature.END
                 },
                 new ASTSubBlock
                 {
