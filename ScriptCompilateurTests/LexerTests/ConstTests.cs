@@ -1,8 +1,9 @@
 using LangScriptCompilateur.Models;
-using static LangScriptCompilateur.Models.Signature;
+using LangScriptCompilateur.Models.Enums;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
+using static LangScriptCompilateur.Models.Enums.Signature;
 
 namespace ScriptCompilateurTests.LexerTests
 {

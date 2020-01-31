@@ -1,7 +1,8 @@
-using System.Collections.Generic;
 using LangScriptCompilateur;
 using LangScriptCompilateur.Models;
+using LangScriptCompilateur.Models.Enums;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace ScriptCompilateurTests.ParserTests
 {
@@ -10,14 +11,14 @@ namespace ScriptCompilateurTests.ParserTests
         [Test]
         public void SubBlocks()
         {
-            List<Token> ast = new List<Token>
+            var ast = new List<Token>
             {
-                new Token{ Signature.LBRACE },
-                new Token{ Signature.LPAREN },
-                new Token{ Signature.LBRACKET },
-                new Token{ Signature.RBRACKET },
-                new Token{ Signature.RPAREN },
-                new Token{ Signature.RBRACE },
+                new Token() { Signature = Signature.LBRACE },
+                new Token() { Signature = Signature.LPAREN },
+                new Token() { Signature = Signature.LBRACKET },
+                new Token() { Signature = Signature.RBRACKET },
+                new Token() { Signature = Signature.RPAREN },
+                new Token() { Signature = Signature.RBRACE },
             };
 
             List<ASTSubBlock> parsed = new List<ASTSubBlock>()

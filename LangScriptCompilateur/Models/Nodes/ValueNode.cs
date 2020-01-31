@@ -2,8 +2,6 @@
 
 namespace LangScriptCompilateur.Models.Nodes
 {
-
-
     public class ValueNode<T> : SyntaxNode
     {
         public ValueNodeType ValueNodeType { get; }

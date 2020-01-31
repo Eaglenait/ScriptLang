@@ -1,8 +1,6 @@
 ﻿using LangScriptCompilateur;
 using LangScriptCompilateur.Models;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace ScriptCompilateurTests
 {

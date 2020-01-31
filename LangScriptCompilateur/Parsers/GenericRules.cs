@@ -1,9 +1,9 @@
-﻿using System.Reflection;
-using System.Collections.Generic;
-using System.Linq;
-using LangScriptCompilateur.Models;
+﻿using LangScriptCompilateur.Models;
 using LangScriptCompilateur.Models.Enums;
 using LangScriptCompilateur.Models.Nodes;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace LangScriptCompilateur.Parsers
 {
@@ -27,7 +27,7 @@ namespace LangScriptCompilateur.Parsers
                 object methodResult = method.Invoke(this, null);
 
                 if(!(methodResult is SyntaxNode))
-                    return SyntaxNode.None();
+                    return SyntaxNode.None;
 
                 SyntaxNode result = (SyntaxNode)methodResult;
                 switch(result.NodeType) {
@@ -36,11 +36,11 @@ namespace LangScriptCompilateur.Parsers
 
                     default:
                     case OperationType.NONE:
-                        return SyntaxNode.None();
+                        return SyntaxNode.None;
                 }
             }
 
-            return SyntaxNode.None();
+            return SyntaxNode.None;
         }
 
         private SyntaxNode Rule_IsReturnVoidStatement()
@@ -58,7 +58,7 @@ namespace LangScriptCompilateur.Parsers
                     };
                 }
             }
-            return SyntaxNode.None();
+            return SyntaxNode.None;
         }
     }
 }

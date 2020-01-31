@@ -1,10 +1,5 @@
-﻿using LangScriptCompilateur;
-using LangScriptCompilateur.Models;
-using LangScriptCompilateur.Models.Enums;
+﻿using LangScriptCompilateur.Models;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ScriptCompilateurTests
 {

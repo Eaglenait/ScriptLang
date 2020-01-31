@@ -3,9 +3,7 @@ using LangScriptCompilateur.Models.Enums;
 using LangScriptCompilateur.Models.Nodes;
 using LangScriptCompilateur.Parsers;
 using NUnit.Framework;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace ScriptCompilateurTests
 {

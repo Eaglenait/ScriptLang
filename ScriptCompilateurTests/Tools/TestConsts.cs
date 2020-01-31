@@ -1,7 +1,6 @@
 ﻿using LangScriptCompilateur.Models;
-using System;
 using System.Collections.Generic;
-using System.Text;
+using static LangScriptCompilateur.Models.Enums.Signature;
 
 namespace ScriptCompilateurTests
 {
@@ -11,13 +10,12 @@ namespace ScriptCompilateurTests
         {
             return new List<Token>()
             {
-                new Token{ Signature = Signature.KW_IF},
-                new Token{ Signature = Signature.LPAREN},
-                new Token{ Signature = Signature.RPAREN},
-                new Token{ Signature = Signature.LBRACE},
-                new Token{ Signature = Signature.RBRACE}
+                new Token{ Signature = KW_IF },
+                new Token{ Signature = LPAREN },
+                new Token{ Signature = RPAREN },
+                new Token{ Signature = LBRACE },
+                new Token{ Signature = RBRACE }
             };
         }
-
     }
 }

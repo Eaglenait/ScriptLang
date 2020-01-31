@@ -1,6 +1,6 @@
-﻿using System;
+﻿using LangScriptCompilateur;
+using System;
 using System.IO;
-using LangScriptCompilateur;
 
 namespace ScriptLangConsole
 {

@@ -1,4 +1,5 @@
 ﻿using LangScriptCompilateur.Models;
+using LangScriptCompilateur.Models.Enums;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;

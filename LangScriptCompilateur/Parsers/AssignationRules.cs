@@ -1,16 +1,12 @@
 ﻿using LangScriptCompilateur.Models;
 using LangScriptCompilateur.Models.Enums;
-using System;
 using System.Linq;
 using System.Reflection;
-using System.Collections.Generic;
 
 namespace LangScriptCompilateur.Parsers
 {
     class AssignationRules : IParseRule
     {
-        private List<Delegate> Rules { get; set; } = new List<Delegate>();
-
         public SyntaxNode Execute()
         {
             //Reflectively executes every private method that has "Rule_" in front of its name
@@ -24,7 +20,12 @@ namespace LangScriptCompilateur.Parsers
                 }
             }
 
-            return SyntaxNode.None();
+            return SyntaxNode.None;
+        }
+
+        private SyntaxNode Rule_AssignationRule()
+        {
+            return SyntaxNode.None; 
         }
     }
 }

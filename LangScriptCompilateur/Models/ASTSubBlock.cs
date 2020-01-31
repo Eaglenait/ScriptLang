@@ -1,3 +1,5 @@
+using LangScriptCompilateur.Models.Enums;
+
 namespace LangScriptCompilateur.Models
 {
     public class ASTSubBlock
@@ -6,6 +8,5 @@ namespace LangScriptCompilateur.Models
         public int EndIndex { get; set; }
         public int Depth { get; set; }
         public Signature BlockType { get; set; }
-
     }
 }

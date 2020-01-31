@@ -1,6 +1,6 @@
 using LangScriptCompilateur.Models;
+using LangScriptCompilateur.Models.Enums;
 using NUnit.Framework;
-using ScriptCompilateurTests;
 using System.Collections.Generic;
 using System.Linq;
 
