@@ -1,7 +1,4 @@
 ﻿using LangScriptCompilateur.Models;
-using LangScriptCompilateur.Models.Enums;
-using System;
-using System.Collections.Generic;
 
 namespace LangScriptCompilateur
 {

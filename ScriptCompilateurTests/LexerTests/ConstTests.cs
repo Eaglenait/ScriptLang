@@ -1,7 +1,6 @@
 using LangScriptCompilateur.Models;
 using static LangScriptCompilateur.Models.Signature;
 using NUnit.Framework;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 

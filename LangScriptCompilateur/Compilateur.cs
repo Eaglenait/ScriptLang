@@ -1,5 +1,4 @@
-﻿using LangScriptCompilateur.Models;
-using System;
+﻿using System;
 
 namespace LangScriptCompilateur
 {
