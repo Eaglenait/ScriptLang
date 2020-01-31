@@ -1,5 +1,4 @@
-﻿using System;
-using LangScriptCompilateur.Models;
+﻿using LangScriptCompilateur.Models;
 using LangScriptCompilateur.Models.Enums;
 using LangScriptCompilateur.Parsers;
 using System.Collections.Generic;
@@ -9,9 +8,12 @@ namespace LangScriptCompilateur
     public class Parser
     {
         private List<Token> Ast { get; set; }
+        private List<IParseRule> Rules { get; set; }
 
         public Parser(List<Token> ast) {
             Ast = ast;
+
+            Rules = new List<IParseRule>();
         }
 
         public List<ASTSubBlock> SubBlocks()
@@ -49,43 +51,13 @@ namespace LangScriptCompilateur
             return subBlocks;
         }
 
-        public SyntaxTree ParseAST(List<Token> ast)
+        public void Execute()
         {
-            SyntaxTree parsedTree =  new SyntaxTree();
-
-            List<Token> subList = new List<Token>();
-            foreach(Token node in ast)
+            foreach (IParseRule rule in Rules)
             {
-                if (node.Signature != Signature.END)
-                {
-                    subList.Add(node);
-                }
-                else
-                {
-                    subList.Add(new Token { Signature = Signature.END });
-                    SyntaxNode generic = new GenericRules(subList).Execute();
-
-                    subList = new List<Token>();
-
-                    switch(generic.NodeType) {
-                        default:
-                        case OperationType.NONE:
-                        case OperationType.PARENT:
-                        case OperationType.ASSIGNATION:
-                        case OperationType.DECLARATION:
-                        case OperationType.BLOCK:
-                        case OperationType.VARIABLE:
-                        case OperationType.CONST:
-                            break;
-
-                        case OperationType.RETURN:
-                            Console.WriteLine("Add ReturnNode");
-                            parsedTree.AddChild(generic);
-                            return parsedTree;
-                    }
-                }
+                rule.Execute();
             }
-            return null;
         }
+
     }
 }
