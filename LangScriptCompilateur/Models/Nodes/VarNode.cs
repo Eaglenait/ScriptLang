@@ -1,13 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace LangScriptCompilateur.Models.Nodes
 {
-    public class DeclarationNode : SyntaxNode
+    //represents a variable in the tree
+    public class VarNode : ValueNode
     {
         public string VarName { get; set; }
-        public ValueNode Value { get; set; }
-        public DeclarationNode() { }
+        public VarNode()
+        { }
     }
 }

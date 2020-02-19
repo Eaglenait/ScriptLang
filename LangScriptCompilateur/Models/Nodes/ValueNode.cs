@@ -7,7 +7,7 @@ namespace LangScriptCompilateur.Models.Nodes
         public ValueNodeType ValueNodeType { get; }
         public bool IsNullable { get; }
         public bool IsNull { get; set; }
-        public ValueNodeType ValueType { get; set; } 
+        public ValueNodeType ValueType { get; set; }
         public object Value { get; set; }
 
         public ValueNode(object value, ValueNodeType type) {

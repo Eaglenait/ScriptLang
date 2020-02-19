@@ -62,6 +62,7 @@
 
         KW_TRUE,
         KW_FALSE,
+        KW_NULL,
 
         //Game Consts
         CONST_SELF,

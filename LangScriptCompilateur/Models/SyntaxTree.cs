@@ -9,7 +9,7 @@ namespace LangScriptCompilateur.Models
     public class SyntaxTree
     {
         public SyntaxNode TreeRoot { get; private set; }
-        List<int> CurrentNode { get; set; }
+        public List<int> CurrentNode { get; private set; }
         private KompilationLogger _logger;
 
         public SyntaxTree()
@@ -94,7 +94,7 @@ namespace LangScriptCompilateur.Models
             SyntaxNode syntaxNode = TreeRoot;
             for (int i = 0; i < coords.Length; i++)
             {
-                syntaxNode = syntaxNode.Childrens[coords[i]]; 
+                syntaxNode = syntaxNode.Childrens[coords[i]];
             }
             return syntaxNode;
         }
@@ -118,11 +118,11 @@ namespace LangScriptCompilateur.Models
                 else
                 {
                     //we can add the last child without correct coords
-                    //last coord is the index of the child in the last parent node 
+                    //last coord is the index of the child in the last parent node
                     if (coords[0] != syntaxNode.Childrens.Count)
                         _logger.LogWarning(string.Format("New Child coordinates mismatch lastidx:{0} tried:{1} actual {2}"
                                                         , syntaxNode.Childrens.Count, coords[0], syntaxNode.Childrens.Count));
-                
+
                     syntaxNode.Childrens.Add(node);
                 }
             }
@@ -136,7 +136,7 @@ namespace LangScriptCompilateur.Models
                 strCoords.AppendFormat("{0}, ", coord.ToString());
             }
 
-            //Pop last ',' 
+            //Pop last ','
             strCoords.Length--;
             return strCoords.ToString();
         }
