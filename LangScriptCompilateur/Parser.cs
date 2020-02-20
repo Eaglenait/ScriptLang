@@ -18,9 +18,12 @@ namespace LangScriptCompilateur
             Tree = new SyntaxTree();
         }
 
-        public VarNode SeekVariableDeclaration()
+        //todo add scope validation
+        public VarNode SeekVariableDeclarationWithName(string name)
         {
             var currentCoords = Tree.currentNode;
+
+            VarNode varNode = null;
 
             do
             {
@@ -32,13 +35,17 @@ namespace LangScriptCompilateur
                         var valueChild = child as VarNode;
                         if (valueChild.VarName)
                         {
-                            return valueChild;
+                            if(valueChild.VarName == name)
+                            {
+                                varNode = valueChild;
+                            }
                         }
                     }
                 }
             } while(Tree.currentNode.Count > 1);
 
             Tree.Go(currentCoords);
+            return varNode;
         }
 
         public (int, ReturnNode) ParseReturnStatement(int at)
@@ -96,7 +103,7 @@ namespace LangScriptCompilateur
 
                 case Signature.IDENTIFIER:
                     //Search tree for declaration
-                    SeekVariableDeclaration();
+                    var varDecl = SeekVariableDeclarationWithName(Ast);
                     break;
             }
 
