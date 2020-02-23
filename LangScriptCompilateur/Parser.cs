@@ -7,10 +7,10 @@ namespace LangScriptCompilateur
 {
     public class Parser
     {
-        //source
+        //Source
         private List<Token> Ast { get; set; }
 
-        //destination
+        //Destination
         public SyntaxTree Tree { get; private set; }
 
         public Parser(List<Token> ast) {
@@ -18,33 +18,43 @@ namespace LangScriptCompilateur
             Tree = new SyntaxTree();
         }
 
-        //todo add scope validation
-        public VarNode SeekVariableDeclarationWithName(string name)
+        private void ParseTopLevelDecl()
         {
-            var currentCoords = Tree.currentNode;
+            foreach (var token in Ast)
+            {
+                if (token.Signature.IsOpeningSignature())
+                {
+
+                }
+            }
+
+        }  
+
+        //todo add scope validation
+        private VarNode SeekVariableDeclarationWithName(string name)
+        {
+            var currentCoords = Tree.CurrentNode;
 
             VarNode varNode = null;
 
             do
             {
-                SyntaxNode parent = GoCurrentParent();
-                foreach (var child in parent.GetChildrens())
+                //Changes tree coords
+                SyntaxNode parent = Tree.GoCurrentParent();
+                foreach (var child in parent.Childrens)
                 {
                     if (child is VarNode)
                     {
                         var valueChild = child as VarNode;
-                        if (valueChild.VarName)
+                        if (valueChild.VarName == name)
                         {
-                            if(valueChild.VarName == name)
-                            {
-                                varNode = valueChild;
-                            }
+                            varNode = valueChild;
                         }
                     }
                 }
-            } while(Tree.currentNode.Count > 1);
+            } while(Tree.CurrentNode.Count > 1);
 
-            Tree.Go(currentCoords);
+            Tree.Go(currentCoords.ToArray());
             return varNode;
         }
 
@@ -61,12 +71,6 @@ namespace LangScriptCompilateur
 
             //first Signature is return kw second should be return value or ';'
             at++;
-
-            if (Ast[at].Signature != Signature.IDENTIFIER
-             || Ast[at].Signature != Signature.END)
-            {
-                return null;
-            }
 
             switch (Ast[at].Signature)
             {
@@ -103,15 +107,25 @@ namespace LangScriptCompilateur
 
                 case Signature.IDENTIFIER:
                     //Search tree for declaration
-                    var varDecl = SeekVariableDeclarationWithName(Ast);
+                    var varDecl = SeekVariableDeclarationWithName(Ast[at].Word);
+                    if(varDecl == null)
+                    {
+                        goto default;
+                    }
+
+                    rNode.Value = varDecl;
+                    //delete var decl here
                     break;
+
+                default:
+                    return (0, null);
             }
 
             //now signature should be END
             at++;
             if(Ast[at].Signature != Signature.END)
             {
-                return null;
+                return (0, null);
             }
 
             rNode.Value = returnValue;

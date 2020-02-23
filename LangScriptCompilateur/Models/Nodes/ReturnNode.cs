@@ -3,6 +3,6 @@
     public class ReturnNode : SyntaxNode
     {
         public TypesEnum Type { get; set; }
-        public object Value { get; set; }
+        public VarNode Value { get; set; }
     }
 }
