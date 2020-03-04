@@ -5,6 +5,16 @@ namespace LangScriptCompilateur
 {
     public static class ScriptToolbox
     {
+        public static bool IsConstSignature(this Signature s)
+        {
+            switch(s)
+            {
+        case I_CONST:
+        case F_CONST:
+        case STRINGLITTERAL:
+            }
+        }
+
         public static bool IsStructuralKeyWord(this Signature s)
         {
             switch (s)

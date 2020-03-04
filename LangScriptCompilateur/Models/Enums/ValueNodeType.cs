@@ -3,6 +3,7 @@
     public enum ValueNodeType
     {
         CONST,
+        CONSTLITERAL,
         VARIABLE
     }
 }

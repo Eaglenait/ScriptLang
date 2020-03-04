@@ -2,19 +2,12 @@
 
 namespace LangScriptCompilateur.Models.Nodes
 {
-    public class ValueNode : SyntaxNode
+    //represents a value in code
+    public class ValueNode
     {
         public ValueNodeType ValueNodeType { get; }
-        public bool IsNullable { get; }
+        public TypesEnum ValueType {get;set;}
         public bool IsNull { get; set; }
-        public ValueNodeType ValueType { get; set; }
         public object Value { get; set; }
-
-        public ValueNode(object value, ValueNodeType type) {
-            IsNullable = false;
-            IsNull = false;
-            Value = value;
-            ValueNodeType = type;
-        }
     }
 }

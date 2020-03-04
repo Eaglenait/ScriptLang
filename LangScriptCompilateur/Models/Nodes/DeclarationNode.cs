@@ -6,8 +6,6 @@ namespace LangScriptCompilateur.Models.Nodes
 {
     public class DeclarationNode : SyntaxNode
     {
-        public string VarName { get; set; }
-        public ValueNode Value { get; set; }
-        public DeclarationNode() { }
+        public VarNode Variable { get; set; }
     }
 }

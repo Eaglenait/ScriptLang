@@ -4,5 +4,9 @@
     {
         public TypesEnum Type { get; set; }
         public VarNode Value { get; set; }
+
+        public ReturnNode(){
+            Value = new VarNode();
+        }
     }
 }
