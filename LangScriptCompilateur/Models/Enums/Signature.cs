@@ -29,6 +29,8 @@
         OP_MINUS_ASSIGN,
         OP_MUL,
         OP_MUL_ASSIGN,
+        OP_DIVIDE,
+        OP_DIVIDE_ASSIGN,
         OP_INCREMENT,
         OP_DECREMENT,
         OP_EQUALS,

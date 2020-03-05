@@ -7,5 +7,10 @@ namespace LangScriptCompilateur.Models.Nodes
     public class DeclarationNode : SyntaxNode
     {
         public VarNode Variable { get; set; }
+
+        public DeclarationNode()
+        {
+            Variable = new VarNode();
+        }
     }
 }

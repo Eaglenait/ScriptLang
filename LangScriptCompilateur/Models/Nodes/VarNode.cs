@@ -6,5 +6,10 @@ namespace LangScriptCompilateur.Models.Nodes
         public string VarName { get; set; }
         public VarNode()
         { }
+
+        public ValueNode GetValue()
+        {
+            return this as ValueNode;
+        }
     }
 }

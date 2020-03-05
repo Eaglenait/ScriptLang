@@ -1,4 +1,5 @@
-﻿using LangScriptCompilateur.Models;
+﻿using System;
+using LangScriptCompilateur.Models;
 using LangScriptCompilateur.Models.Enums;
 using LangScriptCompilateur.Models.Nodes;
 using System.Collections.Generic;
@@ -7,7 +8,6 @@ namespace LangScriptCompilateur
 {
     //todo
     //ParseVarDeclaration
-    //toplevel var declaration
     public class Parser
     {
         //Source
@@ -19,11 +19,13 @@ namespace LangScriptCompilateur
         public Parser(List<Token> ast) {
             Ast = ast;
             Tree = new SyntaxTree();
+
         }
 
+        //Parses top level variable declaration and adds them to the tree
         private void ParseTopLevelDecl()
         {
-            for(int i = 0; i < Ast.Length; i++)
+            for(int i = 0; i < Ast.Count; i++)
             {
                 //case if we go down a level
                 if(Ast[i].Signature.IsOpeningSignature())
@@ -37,7 +39,8 @@ namespace LangScriptCompilateur
                     if(parsedVarDeclaration.Item1 == 0 && parsedVarDeclaration.Item2 == null)
                     {
                         //bad parse error in code
-                        throw new Exception("Bad code please handle");
+                        //TODO handle
+                        throw new Exception("Bad code");
                     }
 
                     i = parsedVarDeclaration.Item1;
@@ -47,13 +50,14 @@ namespace LangScriptCompilateur
             }
         }
 
-        //todo add scope validation
-        //     test
-        private VarNode SeekVariableDeclarationWithName(string name)
+        //  Todo add scope validation
+        //       test
+        //Search for a declared variable by name
+        private DeclarationNode SeekVariableDeclarationWithName(string name)
         {
             var currentCoords = Tree.CurrentNode;
 
-            VarNode varNode = null;
+            DeclarationNode declNode = null;
 
             do
             {
@@ -61,22 +65,23 @@ namespace LangScriptCompilateur
                 SyntaxNode parent = Tree.GoCurrentParent();
                 foreach (var child in parent.Childrens)
                 {
-                    if (child is VarNode)
+                    if (child is DeclarationNode)
                     {
-                        var valueChild = child as VarNode;
-                        if (valueChild.VarName == name)
+                        var valueChild = child as DeclarationNode;
+                        if (valueChild.Variable.VarName == name)
                         {
-                            varNode = valueChild;
+                            declNode = valueChild;
                         }
                     }
                 }
             } while(Tree.CurrentNode.Count > 1);
 
+            //reposition current node
             Tree.Go(currentCoords.ToArray());
-            return varNode;
+            return declNode;
         }
 
-        public (int, ReturnNode) ParseReturnStatement(int at)
+        private (int, ReturnNode) ParseReturnStatement(int at)
         {
             ReturnNode rNode = new ReturnNode
             {
@@ -94,7 +99,7 @@ namespace LangScriptCompilateur
                     rNode.Value.IsNull = false;
                     rNode.Value.ValueType = TypesEnum.BOOL;
 
-                    if(Ast[at].Signature == KW_FALSE)
+                    if(Ast[at].Signature == Signature.KW_FALSE)
                     {
                         rNode.Value.Value = false;
                     }
@@ -133,7 +138,7 @@ namespace LangScriptCompilateur
                     break;
 
                 case Signature.STRINGLITTERAL:
-                    rNode.Value = Ast[at].Word;
+                    rNode.Value.Value = Ast[at].Word;
                     rNode.Value.ValueType = TypesEnum.STRING;
                     rNode.Value.IsNull = false;
                     break;
@@ -146,8 +151,8 @@ namespace LangScriptCompilateur
                         goto default;
                     }
 
-                    rNode.Value = varDecl;
-                    //delete var decl here
+                    //TODO ref or copy
+                    rNode.Value = varDecl.Variable;
                     break;
 
                 default:
@@ -161,114 +166,127 @@ namespace LangScriptCompilateur
                 return (0, null);
             }
 
-            rNode.Value = returnValue;
-            rNode.Type = returnType;
-
             //return to next signature
             return (at++, rNode);
         }
 
+        //todo nullability
+        //     type checking
         public (int, DeclarationNode) ParseVarDeclaration(int at)
         {
-            //at 0 is always Signature.TYPENAME
-            at++;
+            DeclarationNode dNode = new DeclarationNode();
 
-            DeclarationNode dNode = new DeclarationNode()
-            {
-                NodeType = OperationType.DECLARATION;
-            }
+            //at 0 is always Signature.TYPENAME
+            dNode.Variable.ValueNodeType = ValueNodeType.VARIABLE;
+            string declTypeName = Ast[at].Word;
+
+            at++;
 
             if (Ast[at].Signature != Signature.IDENTIFIER)
             {
                 return (0, null);
             }
 
-            dNode.VarName = Ast[at].Word;
+            dNode.Variable.VarName = Ast[at].Word;
 
             at++;
 
             if (Ast[at].Signature != Signature.OP_EQUALS)
             {
+                //not assignation case;
                 return (0, null);
             }
 
             at++;
 
-            ValueNode vNode = new ValueNode();
-
             switch(Ast[at].Signature)
             {
-                case IDENTIFIER:
+                case Signature.IDENTIFIER:
                     //Search tree for declaration
                     var varDecl = SeekVariableDeclarationWithName(Ast[at].Word);
+                    //if no declaration then invalid var decl;
                     if(varDecl == null)
                     {
                         goto default;
                     }
 
-                    vNode.Value = varDecl;
-                    //delete var decl here
+                    //else if declaration exists then copy
+                    dNode.Variable = varDecl.Variable;
                     break;
 
-                case I_CONST:
-                case F_CONST:
-                case STRINGLITTERAL:
-                    vNode.ValueNodeType = ValueNodeType.CONSTLITERAL;
-                    vNode.IsNull = false;
+                case Signature.I_CONST:
+                case Signature.F_CONST:
+                case Signature.STRINGLITTERAL:
+                    dNode.Variable.ValueNodeType = ValueNodeType.CONSTLITERAL;
+                    dNode.Variable.IsNull = false;
+                    bool badTypeflag = false;
 
                     if(Ast[at].Signature == Signature.I_CONST)
                     {
                         if(int.TryParse(Ast[at].Word, out int intValue))
                         {
-                            vNode.Value = intValue;
-                            vNode.ValueType = TypesEnum.INT;
+                            dNode.Variable.Value = intValue;
+                            dNode.Variable.ValueType = TypesEnum.INT;
+                        }
+                        else
+                        {
+                            badTypeflag = true;
                         }
                     }
                     else if(Ast[at].Signature == Signature.F_CONST)
                     {
                         if(float.TryParse(Ast[at].Word, out float floatValue))
                         {
-                            vNode.Value = floatValue;
-                            vNode.ValueType = TypesEnum.FLOAT;
+                            dNode.Variable.Value = floatValue;
+                            dNode.Variable.ValueType = TypesEnum.FLOAT;
+                        }
+                        else
+                        {
+                            badTypeflag = true;
                         }
                     }
                     else /*STRINGLITTERAL*/ {
-                        vNode.Value = Ast[at].Word;
-                        vNode.ValueType = TypesEnum.STRING;
+                        dNode.Variable.Value = Ast[at].Word;
+                        dNode.Variable.ValueType = TypesEnum.STRING;
                     }
 
+                    if(badTypeflag)
+                    {
+                        //TODO handle
+                        throw new Exception("mismatched type");
+                    }
                     break;
 
-                case KW_TRUE:
-                case KW_FALSE:
-                    vNode.ValueNodeType = ValueNodeType.CONSTLITERAL;
-                    vNode.IsNull = false;
-                    vNode.ValueType = TypesEnum.BOOL;
+                case Signature.KW_TRUE:
+                case Signature.KW_FALSE:
+                    dNode.Variable.ValueNodeType = ValueNodeType.CONSTLITERAL;
+                    dNode.Variable.IsNull = false;
+                    dNode.Variable.ValueType = TypesEnum.BOOL;
 
                     if(Ast[at].Signature == Signature.KW_TRUE)
                     {
-                        vNode.Value = true;
+                        dNode.Variable.Value = true;
                     }
                     else if(Ast[at].Signature == Signature.KW_FALSE)
                     {
-                        vNode.Value = false;
+                        dNode.Variable.Value = false;
                     }
                     break;
 
-                case CONST_SELF:
-                case CONST_WORLD:
-                case CONST_SCRIPT:
+                case Signature.CONST_SELF:
+                case Signature.CONST_WORLD:
+                case Signature.CONST_SCRIPT:
                     //Todo verify that the accessed const returns the valid type
 
-                    vNode.ValueNodeType = ValueNodeType.VARIABLE;
-                    vNode.IsNull = true;
+                    dNode.Variable.ValueNodeType = ValueNodeType.VARIABLE;
+                    dNode.Variable.IsNull = true;
                     break;
 
-                case KW_NULL:
-                    vNode.ValueNodeType = ValueNodeType.CONSTLITERAL;
-                    vNode.IsNull = true;
-                    vNode.ValueType = TypesEnum.VOID;
-                    vNode.Value = null;
+                case Signature.KW_NULL:
+                    dNode.Variable.ValueNodeType = ValueNodeType.CONSTLITERAL;
+                    dNode.Variable.IsNull = true;
+                    dNode.Variable.ValueType = TypesEnum.VOID;
+                    dNode.Variable.Value = null;
                     break;
 
                 default:
@@ -282,37 +300,53 @@ namespace LangScriptCompilateur
                 return (0, null);
             }
 
-            return dNode;
+            //TODO verify that it returns the correct position
+            return (at, dNode);
         }
 
         public void Execute()
         {
             ParseTopLevelDecl();
 
+            bool badParseFlag = false;
             for (int i = 0; i < Ast.Count; i++)
             {
+                if(badParseFlag)
+                {
+                    //TODO handle better
+                    return;
+                }
+
                 switch(Ast[i].Signature)
                 {
                     case Signature.TYPENAME:
-                        ParseVarDeclaration(i);
+                        var parsedVarDeclaration = ParseVarDeclaration(i);
+                        if (parsedVarDeclaration.Item1 == 0
+                         || parsedVarDeclaration.Item2 == null)
+                        {
+                            badParseFlag = true;
+                            continue;
+                        }
+
+                        i = parsedVarDeclaration.Item1;
+                        Tree.AddChild(parsedVarDeclaration.Item2);
+                        Tree.GoCurrentParent();
+
                         break;
 
                     case Signature.KW_RETURN:
-                        var parsedReturnStatment = ParseReturnStatement();
-                        i = parsedReturnStatement.Item1;
-
-                        if(parsedReturnStatment.Item2 != null)
+                        var parsedReturnStatement = ParseReturnStatement(i);
+                        if (parsedReturnStatement.Item1 == 0
+                         || parsedReturnStatement.Item2 == null)
                         {
-                            Tree.AddChild(parsedReturnStatment.Item2);
-                            Tree.GoCurrentParent();
+                            badParseFlag = true;
+                            continue;
                         }
-                        break;
-                }
 
-                //Return
-                if (Ast[i].Signature == Signature.KW_RETURN)
-                {
-                    Tree.AddChild(rNode);
+                        i = parsedReturnStatement.Item1;
+                        Tree.AddChild(parsedReturnStatement.Item2);
+                        Tree.GoCurrentParent();
+                        break;
                 }
             }
         }

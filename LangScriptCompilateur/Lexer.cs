@@ -105,7 +105,6 @@ namespace LangScriptCompilateur
                                 });
                             }
                         break;
-
                     case '<':
                         if (IsNextIndexValid(i))
                         {
@@ -122,6 +121,36 @@ namespace LangScriptCompilateur
                                 Tokens.Add(new Token() {
                                     Signature = Signature.OP_LESS_THAN
                                 });
+                            }
+                        }
+                        break;
+                    case '/':
+                        if (IsNextIndexValid(i))
+                        {
+                            switch (Script[i + 1])
+                            {
+                                case '=':
+                                    Tokens.Add(new Token() { Signature = Signature.OP_DIVIDE_ASSIGN });
+                                    i += 1;
+                                    break;
+                                default:
+                                    Tokens.Add(new Token() { Signature = Signature.OP_DIVIDE });
+                                    break;
+                            }
+                        }
+                        break;
+                    case '*':
+                        if (IsNextIndexValid(i))
+                        {
+                            switch (Script[i + 1])
+                            {
+                                case '=':
+                                    Tokens.Add(new Token() { Signature = Signature.OP_MUL_ASSIGN });
+                                    i += 1;
+                                    break;
+                                default:
+                                    Tokens.Add(new Token() { Signature = Signature.OP_MUL });
+                                    break;
                             }
                         }
                         break;

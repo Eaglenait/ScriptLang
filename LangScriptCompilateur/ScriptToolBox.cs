@@ -5,13 +5,38 @@ namespace LangScriptCompilateur
 {
     public static class ScriptToolbox
     {
-        public static bool IsConstSignature(this Signature s)
+        //Returns true if the signature can be used in a mathematical operation
+        //Returns false otherwise
+        public static bool IsValidMathOperationSignature(this Signature s)
         {
             switch(s)
             {
-        case I_CONST:
-        case F_CONST:
-        case STRINGLITTERAL:
+                case Signature.OP_PLUS_ASSIGN:
+                case Signature.OP_MINUS_ASSIGN:
+                case Signature.OP_MUL_ASSIGN:
+                case Signature.OP_INCREMENT:
+                case Signature.OP_DECREMENT:
+                case Signature.OP_EQUALS:
+                case Signature.OP_NOTEQUALS:
+                case Signature.OP_ASSIGN:
+                case Signature.LPAREN:
+                case Signature.RPAREN:
+                case Signature.OP_GREATER_THAN_OR_EQUALS:
+                case Signature.OP_LESS_THAN_OR_EQUALS:
+                case Signature.OP_GREATER_THAN:
+                case Signature.OP_LESS_THAN:
+                case Signature.OP_NOT:
+
+                case Signature.I_CONST:
+                case Signature.F_CONST:
+                case Signature.OP_PLUS:
+                case Signature.OP_MINUS:
+                case Signature.OP_MUL:
+                case Signature.KW_TRUE:
+                case Signature.KW_FALSE:
+                    return true;
+                default:
+                    return false;
             }
         }
 
