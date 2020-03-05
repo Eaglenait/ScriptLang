@@ -7,7 +7,6 @@ using System.Collections.Generic;
 namespace LangScriptCompilateur
 {
     //todo
-    //ParseVarDeclaration
     public class Parser
     {
         //Source
@@ -23,8 +22,9 @@ namespace LangScriptCompilateur
         }
 
         //Parses top level variable declaration and adds them to the tree
-        private void ParseTopLevelDecl()
+        private int ParseTopLevelDecl()
         {
+            int lastTypeNamePosition = 0;
             for(int i = 0; i < Ast.Count; i++)
             {
                 //case if we go down a level
@@ -35,6 +35,7 @@ namespace LangScriptCompilateur
 
                 if(Ast[i].Signature == Signature.TYPENAME)
                 {
+                    lastTypeNamePosition = i;
                     var parsedVarDeclaration = ParseVarDeclaration(i);
                     if(parsedVarDeclaration.Item1 == 0 && parsedVarDeclaration.Item2 == null)
                     {
@@ -48,6 +49,8 @@ namespace LangScriptCompilateur
                     Tree.Add(parsedVarDeclaration.Item2);
                 }
             }
+
+            return lastTypeNamePosition;
         }
 
         //  Todo add scope validation
@@ -306,10 +309,8 @@ namespace LangScriptCompilateur
 
         public void Execute()
         {
-            ParseTopLevelDecl();
-
             bool badParseFlag = false;
-            for (int i = 0; i < Ast.Count; i++)
+            for (int i = ParseTopLevelDecl(); i < Ast.Count; i++)
             {
                 if(badParseFlag)
                 {
