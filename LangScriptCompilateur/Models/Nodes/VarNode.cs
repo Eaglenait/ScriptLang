@@ -7,6 +7,7 @@ namespace LangScriptCompilateur.Models.Nodes
         public VarNode()
         { }
 
+        //gets the varnode as valueNode (rvalue conversion)
         public ValueNode GetValue()
         {
             return this as ValueNode;

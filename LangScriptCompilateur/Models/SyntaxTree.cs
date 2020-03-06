@@ -76,6 +76,11 @@ namespace LangScriptCompilateur.Models
             CurrentNode = coords.ToList();
         }
 
+        public SyntaxNode PeekCurrent()
+        {
+            return Peek(CurrentNode.ToArray());
+        }
+
         public SyntaxNode Peek(params int[] coords)
         {
             if(coords.Length == 1)

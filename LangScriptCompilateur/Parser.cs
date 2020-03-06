@@ -133,10 +133,7 @@ namespace LangScriptCompilateur
                 case Signature.END:
                     rNode.Value.ValueType = TypesEnum.VOID;
                     rNode.Value.Value = null;
-                    if(Ast[at].Signature == Signature.KW_NULL)
-                    {
-                        rNode.Value.IsNull = true;
-                    }
+                    rNode.Value.IsNull = true;
                     at--;
                     break;
 

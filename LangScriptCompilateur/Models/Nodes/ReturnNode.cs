@@ -2,7 +2,7 @@
 {
     public class ReturnNode : SyntaxNode
     {
-        public TypesEnum Type { get; set; }
+        //Return Value
         public VarNode Value { get; set; }
 
         public ReturnNode(){
