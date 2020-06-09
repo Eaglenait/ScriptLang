@@ -61,5 +61,14 @@ namespace ScriptCompilateurTests.ParserTests
             var rNode = node as ReturnNode;
             Assert.AreEqual(TypesEnum.BOOL, rNode.Value.ValueType);
         }
+
+        [Test]
+        public void ReturnDeclaredVariableTest()
+        {
+            Parser p = ParserTestHelper.GetParserInstanceForScript("int i = 0; return i;");
+            p.Execute();
+
+            SyntaxNode node = p.Tree.PeekCurrent();
+        }
     }
 }

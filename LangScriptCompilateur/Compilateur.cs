@@ -1,4 +1,6 @@
-﻿using System;
+﻿using LangScriptCompilateur.Models;
+using System;
+using System.Collections.Generic;
 
 namespace LangScriptCompilateur
 {
@@ -17,13 +19,25 @@ namespace LangScriptCompilateur
                 {
                     Console.WriteLine(string.Format("{0} - {1}", token.Word, token.Signature.ToString()));
                 }
-            } else {
+            }
+            else
+            {
                 foreach (var log in KompilationLogger.Instance.Log)
                 {
                     Console.WriteLine(string.Format("{0} - {1}", log.Item2, log.Item1));
                 }
             }
 
+            Parser p = new Parser(lexer.Tokens);
+            p.Execute();
+
+            if(KompilationLogger.Instance.HasFatal())
+            {
+                foreach (var log in KompilationLogger.Instance.Log)
+                {
+                    Console.WriteLine(string.Format("{0} - {1}", log.Item2, log.Item1));
+                }
+            }
             Console.WriteLine("Compile End");
         }
     }

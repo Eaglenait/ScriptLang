@@ -471,6 +471,9 @@ namespace LangScriptCompilateur
                 case "false":
                     return Signature.KW_FALSE;
 
+                case "null":
+                    return Signature.KW_NULL;
+
                 case "World":
                     return Signature.CONST_WORLD;
                 case "Self":

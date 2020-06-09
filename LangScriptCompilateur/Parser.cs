@@ -6,11 +6,17 @@ using System.Collections.Generic;
 
 namespace LangScriptCompilateur
 {
-    //todo
     public class Parser
     {
         //Source
         private List<Token> Ast { get; set; }
+
+        private KompilationLogger _logger;
+
+        public Parser()
+        {
+            _logger = KompilationLogger.Instance;
+        }
 
         //Destination
         public SyntaxTree Tree { get; private set; } = new SyntaxTree();
@@ -18,44 +24,14 @@ namespace LangScriptCompilateur
         public Parser(List<Token> ast) {
             Ast = ast;
             Tree = new SyntaxTree();
-
-        }
-
-        //Parses top level variable declaration and adds them to the tree
-        private int ParseTopLevelDecl()
-        {
-            int lastTypeNamePosition = 0;
-            for(int i = 0; i < Ast.Count; i++)
-            {
-                //case if we go down a level
-                if(Ast[i].Signature.IsOpeningSignature())
-                {
-                    break;
-                }
-
-                if(Ast[i].Signature == Signature.TYPENAME)
-                {
-                    lastTypeNamePosition = i;
-                    var parsedVarDeclaration = ParseVarDeclaration(i);
-                    if(parsedVarDeclaration.Item1 == 0 && parsedVarDeclaration.Item2 == null)
-                    {
-                        //bad parse error in code
-                        //TODO handle
-                        throw new Exception("Bad code");
-                    }
-
-                    i = parsedVarDeclaration.Item1;
-
-                    Tree.Add(parsedVarDeclaration.Item2);
-                }
-            }
-
-            return lastTypeNamePosition;
         }
 
         //  Todo add scope validation
         //       test
-        //Search for a declared variable by name
+        /// <summary>
+        /// Search for a declared variable by name
+        /// </summary>
+        /// <returns></returns>
         private DeclarationNode SeekVariableDeclarationWithName(string name)
         {
             var currentCoords = Tree.CurrentNode;
@@ -84,7 +60,7 @@ namespace LangScriptCompilateur
             return declNode;
         }
 
-        private (int, ReturnNode) ParseReturnStatement(int at)
+        private ReturnNode ParseReturnStatement(ref int at)
         {
             ReturnNode rNode = new ReturnNode
             {
@@ -129,12 +105,17 @@ namespace LangScriptCompilateur
                     }
                     break;
 
-                case Signature.KW_NULL:
                 case Signature.END:
                     rNode.Value.ValueType = TypesEnum.VOID;
                     rNode.Value.Value = null;
                     rNode.Value.IsNull = true;
                     at--;
+                    break;
+
+                case Signature.KW_NULL:
+                    rNode.Value.ValueType = TypesEnum.VOID;
+                    rNode.Value.Value = null;
+                    rNode.Value.IsNull = true;
                     break;
 
                 case Signature.STRINGLITTERAL:
@@ -152,27 +133,36 @@ namespace LangScriptCompilateur
                     }
 
                     //TODO ref or copy
+                    //     return const value
                     rNode.Value = varDecl.Variable;
                     break;
 
                 default:
-                    return (0, null);
+                    at = 0;
+                    return null;
             }
 
             //now signature should be END
             at++;
             if(Ast[at].Signature != Signature.END)
             {
-                return (0, null);
+                at = 0;
+                return null;
             }
 
             //return to next signature
-            return (at++, rNode);
+            at++;
+            return rNode;
+        }
+
+        private IfNode ParsedIfStatement(ref int at)
+        {
+            return null;
         }
 
         //todo nullability
         //     type checking
-        public (int, DeclarationNode) ParseVarDeclaration(int at)
+        private DeclarationNode ParseVarDeclaration(ref int at)
         {
             DeclarationNode dNode = new DeclarationNode();
 
@@ -184,19 +174,23 @@ namespace LangScriptCompilateur
 
             if (Ast[at].Signature != Signature.IDENTIFIER)
             {
-                return (0, null);
+                at = 0;
+                return null;
             }
 
             dNode.Variable.VarName = Ast[at].Word;
 
             at++;
 
-            if (Ast[at].Signature != Signature.OP_EQUALS)
+            if (Ast[at].Signature != Signature.OP_ASSIGN)
             {
                 //not assignation case;
-                return (0, null);
+                _logger.LogFatal("");
+                at = 0;
+                return null;
             }
 
+            //Actual intresting part
             at++;
 
             switch(Ast[at].Signature)
@@ -252,8 +246,7 @@ namespace LangScriptCompilateur
 
                     if(badTypeflag)
                     {
-                        //TODO handle
-                        throw new Exception("mismatched type");
+                        _logger.LogFatal("Mismatched type");
                     }
                     break;
 
@@ -290,63 +283,65 @@ namespace LangScriptCompilateur
                     break;
 
                 default:
-                    return (0, null);
+                    at = 0;
+                    return null;
             }
 
             at++;
 
             if (Ast[at].Signature != Signature.END)
             {
-                return (0, null);
+                at = 0;
+                return null;
             }
 
             //TODO verify that it returns the correct position
-            return (at, dNode);
+            return dNode;
         }
 
         public void Execute()
         {
             bool badParseFlag = false;
-            for (int i = ParseTopLevelDecl(); i < Ast.Count; i++)
+            for (int i = 0; i < Ast.Count; i++)
             {
                 if(badParseFlag)
                 {
-                    //TODO handle better
-                    return;
+                    _logger.LogFatal("Bad parse");
+                    badParseFlag = false;
                 }
 
                 switch(Ast[i].Signature)
                 {
                     case Signature.TYPENAME:
-                        var parsedVarDeclaration = ParseVarDeclaration(i);
-                        if (parsedVarDeclaration.Item1 == 0
-                         || parsedVarDeclaration.Item2 == null)
+                        DeclarationNode parsedVarDeclaration = ParseVarDeclaration(ref i);
+                        if (i == 0)
                         {
                             badParseFlag = true;
                             continue;
                         }
 
-                        i = parsedVarDeclaration.Item1;
-                        Tree.AddChild(parsedVarDeclaration.Item2);
-                        Tree.GoCurrentParent();
-
+                        Tree.AddChild(parsedVarDeclaration);
                         break;
 
                     case Signature.KW_RETURN:
-                        var parsedReturnStatement = ParseReturnStatement(i);
-                        if (parsedReturnStatement.Item1 == 0
-                         || parsedReturnStatement.Item2 == null)
+                        var parsedReturnStatement = ParseReturnStatement(ref i);
+                        if (i == 0
+                           || parsedReturnStatement == null)
                         {
                             badParseFlag = true;
                             continue;
                         }
 
-                        i = parsedReturnStatement.Item1;
-                        Tree.AddChild(parsedReturnStatement.Item2);
-                        Tree.GoCurrentParent();
+                        Tree.AddChild(parsedReturnStatement);
+                        break;
+
+                    case Signature.KW_IF:
+                        //TODO
+                        var parsedIfStatement = ParsedIfStatement(ref i);
                         break;
                 }
             }
         }
+
     }
 }

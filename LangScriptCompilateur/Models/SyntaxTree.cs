@@ -28,6 +28,7 @@ namespace LangScriptCompilateur.Models
         public void AddChild(SyntaxNode child)
         {
             Add(child, CurrentNode.ToArray());
+            CurrentNode[CurrentNode.Count - 1]++;
         }
 
         public List<SyntaxNode> GetChildrens()
@@ -87,7 +88,8 @@ namespace LangScriptCompilateur.Models
             {
                 if (TreeRoot.Childrens.Count >= coords[0])
                 {
-                    return TreeRoot.Childrens[coords[0]];
+                    //"- 1" is possible bad fix (what happend if coord is 0)
+                    return TreeRoot.Childrens[coords[0] - 1];
                 }
                 else
                 {
