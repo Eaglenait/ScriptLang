@@ -31,7 +31,13 @@ namespace LangScriptCompilateur
             Parser p = new Parser(lexer.Tokens);
             p.Execute();
 
-            if(KompilationLogger.Instance.HasFatal())
+            if(!KompilationLogger.Instance.HasFatal())
+            {
+                //go root
+                p.Tree.Go(1);
+
+            }
+            else
             {
                 foreach (var log in KompilationLogger.Instance.Log)
                 {

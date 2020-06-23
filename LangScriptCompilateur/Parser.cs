@@ -21,7 +21,7 @@ namespace LangScriptCompilateur
         //Destination
         public SyntaxTree Tree { get; private set; } = new SyntaxTree();
 
-        public Parser(List<Token> ast) {
+        public Parser(List<Token> ast) : this() {
             Ast = ast;
             Tree = new SyntaxTree();
         }
@@ -60,6 +60,85 @@ namespace LangScriptCompilateur
             return declNode;
         }
 
+        private ValueNode ParseValueNode(ref int at)
+        {
+            var value = new ValueNode();
+
+            switch (Ast[at].Signature)
+            {
+                case Signature.KW_FALSE:
+                case Signature.KW_TRUE:
+                    value.ValueNodeType = ValueNodeType.CONST;
+                    value.IsNull = false;
+                    value.ValueType = TypesEnum.BOOL;
+
+                    if (Ast[at].Signature == Signature.KW_FALSE)
+                    {
+                        value.Value = false;
+                    }
+                    else
+                    {
+                        value.Value = true;
+                    }
+                    break;
+
+                case Signature.I_CONST:
+                case Signature.F_CONST:
+                    value.ValueNodeType = ValueNodeType.CONSTLITERAL;
+                    value.IsNull = false;
+
+                    if (Ast[at].Signature == Signature.I_CONST)
+                    {
+                        value.ValueType = TypesEnum.INT;
+                        value.Value = int.Parse(Ast[at].Word);
+                    }
+                    else
+                    {
+                        value.ValueType = TypesEnum.FLOAT;
+                        value.Value = float.Parse(Ast[at].Word);
+                    }
+                    break;
+
+                case Signature.END:
+                    value.ValueType = TypesEnum.VOID;
+                    value.Value = null;
+                    value.IsNull = true;
+                    at--;
+                    break;
+
+                case Signature.KW_NULL:
+                    value.ValueType = TypesEnum.VOID;
+                    value.Value = null;
+                    value.IsNull = true;
+                    break;
+
+                case Signature.STRINGLITTERAL:
+                    value.Value = Ast[at].Word;
+                    value.ValueType = TypesEnum.STRING;
+                    value.IsNull = false;
+                    break;
+
+                case Signature.IDENTIFIER:
+                    //Search tree for declaration
+                    var varDecl = SeekVariableDeclarationWithName(Ast[at].Word);
+                    if (varDecl == null)
+                    {
+                        goto default;
+                    }
+
+                    //TODO ref or copy
+                    //     return const value
+                    value = varDecl.Variable;
+                    break;
+
+                default:
+                    at = 0;
+                    return null;
+            }
+
+            return value;
+        }
+
         private ReturnNode ParseReturnStatement(ref int at)
         {
             ReturnNode rNode = new ReturnNode
@@ -70,76 +149,12 @@ namespace LangScriptCompilateur
             //first Signature is return kw second should be return value or ';'
             at++;
 
-            switch (Ast[at].Signature)
+            //now parse the return value
+            ValueNode returnValue = ParseValueNode(ref at);
+            if (returnValue == null)
             {
-                case Signature.KW_FALSE:
-                case Signature.KW_TRUE:
-                    rNode.Value.ValueNodeType = ValueNodeType.CONST;
-                    rNode.Value.IsNull = false;
-                    rNode.Value.ValueType = TypesEnum.BOOL;
-
-                    if(Ast[at].Signature == Signature.KW_FALSE)
-                    {
-                        rNode.Value.Value = false;
-                    }
-                    else
-                    {
-                        rNode.Value.Value = true;
-                    }
-                    break;
-
-                case Signature.I_CONST:
-                case Signature.F_CONST:
-                    rNode.Value.ValueNodeType = ValueNodeType.CONSTLITERAL;
-                    rNode.Value.IsNull = false;
-
-                    if(Ast[at].Signature == Signature.I_CONST)
-                    {
-                        rNode.Value.ValueType = TypesEnum.INT;
-                        rNode.Value.Value = int.Parse(Ast[at].Word);
-                    }
-                    else
-                    {
-                        rNode.Value.ValueType = TypesEnum.FLOAT;
-                        rNode.Value.Value = float.Parse(Ast[at].Word);
-                    }
-                    break;
-
-                case Signature.END:
-                    rNode.Value.ValueType = TypesEnum.VOID;
-                    rNode.Value.Value = null;
-                    rNode.Value.IsNull = true;
-                    at--;
-                    break;
-
-                case Signature.KW_NULL:
-                    rNode.Value.ValueType = TypesEnum.VOID;
-                    rNode.Value.Value = null;
-                    rNode.Value.IsNull = true;
-                    break;
-
-                case Signature.STRINGLITTERAL:
-                    rNode.Value.Value = Ast[at].Word;
-                    rNode.Value.ValueType = TypesEnum.STRING;
-                    rNode.Value.IsNull = false;
-                    break;
-
-                case Signature.IDENTIFIER:
-                    //Search tree for declaration
-                    var varDecl = SeekVariableDeclarationWithName(Ast[at].Word);
-                    if(varDecl == null)
-                    {
-                        goto default;
-                    }
-
-                    //TODO ref or copy
-                    //     return const value
-                    rNode.Value = varDecl.Variable;
-                    break;
-
-                default:
-                    at = 0;
-                    return null;
+                at = 0;
+                return null;
             }
 
             //now signature should be END
@@ -155,13 +170,78 @@ namespace LangScriptCompilateur
             return rNode;
         }
 
-        private IfNode ParsedIfStatement(ref int at)
+        //only supports direct comparaison. No result of operation allowed
+        //TODO combinator (&& ||)
+        private ComparaisonNode ParseComparaisonNode(ref int at)
         {
-            return null;
+            ComparaisonNode cn = new ComparaisonNode();
+
+            var l_val = ParseValueNode(ref at);
+
+            at++;
+
+            Signature op = Ast[at].Signature;
+
+            at++;
+
+            var r_val = ParseValueNode(ref at);
+
+            at++;
+
+            if (l_val == null || r_val == null || !op.IsComparationOperator())
+            {
+                at = 0;
+                return null;
+            }
+
+            cn.ComparaisonType = op;
+            cn.l_op = l_val;
+            cn.r_op = r_val;
+
+            return cn;
+        }
+
+        private IfNode ParseIfStatement(ref int at)
+        {
+            var ifNode = new IfNode();
+            //parse operation
+            at++;
+
+            //Parse op
+            if(Ast[at].Signature != Signature.LPAREN)
+            {
+                at = 0;
+                return null;
+            }
+
+            at++;
+            ComparaisonNode cn = ParseComparaisonNode(ref at);
+            if (cn == null)
+            {
+                at = 0;
+                return null;
+            }
+
+            at++;
+
+            //parse else
+            if(Ast[at].Signature == Signature.KW_ELSE)
+            {
+
+            }
+
+
+            return ifNode;
         }
 
         //todo nullability
         //     type checking
+        //     language consts (WORLD,SELF,SCRIPT)
+        /// <summary>
+        /// Parses a variable declaration
+        /// </summary>
+        /// <param name="at">position to start parsing in the ast</param>
+        /// <returns>Declaration node</returns>
         private DeclarationNode ParseVarDeclaration(ref int at)
         {
             DeclarationNode dNode = new DeclarationNode();
@@ -178,6 +258,13 @@ namespace LangScriptCompilateur
                 return null;
             }
 
+            //Search tree for existing declaration
+            var varDecl = SeekVariableDeclarationWithName(Ast[at].Word);
+            if(varDecl != null)
+            {
+                _logger.LogFatal("Redeclaration of variable");
+                return null;
+            }
             dNode.Variable.VarName = Ast[at].Word;
 
             at++;
@@ -185,27 +272,28 @@ namespace LangScriptCompilateur
             if (Ast[at].Signature != Signature.OP_ASSIGN)
             {
                 //not assignation case;
-                _logger.LogFatal("");
+                _logger.LogFatal("Variable declaration without assignation");
                 at = 0;
                 return null;
             }
 
-            //Actual intresting part
+            //Right side value
             at++;
 
             switch(Ast[at].Signature)
             {
                 case Signature.IDENTIFIER:
-                    //Search tree for declaration
-                    var varDecl = SeekVariableDeclarationWithName(Ast[at].Word);
-                    //if no declaration then invalid var decl;
-                    if(varDecl == null)
+                    //Search tree for existing declaration
+                    var r_varDecl = SeekVariableDeclarationWithName(Ast[at].Word);
+                    if(r_varDecl == null)
                     {
+                        _logger.LogFatal("No declaration of right side identifier");
                         goto default;
                     }
 
-                    //else if declaration exists then copy
-                    dNode.Variable = varDecl.Variable;
+                    string varName = dNode.Variable.VarName;
+                    dNode.Variable = r_varDecl.Variable;
+                    dNode.Variable.VarName = varName;
                     break;
 
                 case Signature.I_CONST:
@@ -217,7 +305,8 @@ namespace LangScriptCompilateur
 
                     if(Ast[at].Signature == Signature.I_CONST)
                     {
-                        if(int.TryParse(Ast[at].Word, out int intValue))
+                        if(int.TryParse(Ast[at].Word, out int intValue)
+                           && declTypeName == "int")
                         {
                             dNode.Variable.Value = intValue;
                             dNode.Variable.ValueType = TypesEnum.INT;
@@ -229,7 +318,8 @@ namespace LangScriptCompilateur
                     }
                     else if(Ast[at].Signature == Signature.F_CONST)
                     {
-                        if(float.TryParse(Ast[at].Word, out float floatValue))
+                        if(float.TryParse(Ast[at].Word, out float floatValue)
+                           && declTypeName == "float")
                         {
                             dNode.Variable.Value = floatValue;
                             dNode.Variable.ValueType = TypesEnum.FLOAT;
@@ -302,6 +392,8 @@ namespace LangScriptCompilateur
         public void Execute()
         {
             bool badParseFlag = false;
+            int enclosureLevel = 0;
+
             for (int i = 0; i < Ast.Count; i++)
             {
                 if(badParseFlag)
@@ -312,6 +404,8 @@ namespace LangScriptCompilateur
 
                 switch(Ast[i].Signature)
                 {
+                    //TODO drill up or down
+
                     case Signature.TYPENAME:
                         DeclarationNode parsedVarDeclaration = ParseVarDeclaration(ref i);
                         if (i == 0)
@@ -337,7 +431,25 @@ namespace LangScriptCompilateur
 
                     case Signature.KW_IF:
                         //TODO
-                        var parsedIfStatement = ParsedIfStatement(ref i);
+                        var parsedIfStatement = ParseIfStatement(ref i);
+                        enclosureLevel++;
+
+                        if (parsedIfStatement.HasElse)
+                        {
+
+                        }
+                        break;
+
+                    case Signature.CONST_WORLD:
+                        //TODO
+                        break;
+
+                    case Signature.CONST_SCRIPT:
+                        //TODO
+                        break;
+
+                    case Signature.CONST_SELF:
+                        //TODO
                         break;
                 }
             }

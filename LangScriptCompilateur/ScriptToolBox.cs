@@ -5,6 +5,22 @@ namespace LangScriptCompilateur
 {
     public static class ScriptToolbox
     {
+        public static bool IsComparationOperator(this Signature s)
+        {
+            switch (s)
+            {
+                case Signature.OP_EQUALS:
+                case Signature.OP_NOTEQUALS:
+                case Signature.OP_GREATER_THAN_OR_EQUALS:
+                case Signature.OP_LESS_THAN_OR_EQUALS:
+                case Signature.OP_GREATER_THAN:
+                case Signature.OP_LESS_THAN:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         //Returns true if the signature can be used in a mathematical operation
         //Returns false otherwise
         public static bool IsValidMathOperationSignature(this Signature s)

@@ -61,12 +61,13 @@ namespace LangScriptCompilateur.Models
             }
             else
             {
-                GoRootParentAccess++;
-                if (GoRootParentAccess > 2)
-                {
-                    _logger.LogFatal("Multiple root access");
-                    throw new Exception("Multiple root access");
-                }
+                //meh
+                //GoRootParentAccess++;
+                //if (GoRootParentAccess > 2)
+                //{
+                //    _logger.LogFatal("Multiple root access");
+                //    throw new Exception("Multiple root access");
+                //}
 
                 return TreeRoot;
             }
@@ -75,6 +76,84 @@ namespace LangScriptCompilateur.Models
         public void Go(params int[] coords)
         {
             CurrentNode = coords.ToList();
+        }
+
+        /// <summary>
+        /// Goes through all the nodes in the tree
+        /// 
+        /// </summary>
+        public IEnumerable<SyntaxNode> IterateAllTree()
+        {
+            if (!TreeRoot.HasChildrens)
+            {
+                yield return TreeRoot;
+                yield break;
+            }
+
+            var coords = new List<int>(){ 0 };
+            SyntaxNode currentBranch = null;
+            while(true)
+            {
+                if(coords.Count == 1)
+                {
+                    if(coords[0] == -1) { break; }
+
+                    if(TreeRoot.Childrens[coords[0]].HasChildrens)
+                    {
+                        //go down
+                        coords.Add(0);
+
+                        if(coords[0] < TreeRoot.Childrens.Count)
+                        {
+                            coords[0]++;
+                        }
+                        else
+                        {
+                            //stop on next root iteration
+                            coords[0] = -1;
+                        }
+                    }
+                    else
+                    {
+                        currentBranch = TreeRoot.Childrens[coords[0]];
+                        yield return TreeRoot.Childrens[coords[0]];
+                    }
+                } 
+                else
+                {
+                    if (currentBranch.HasChildrens)
+                    {
+                        //go down
+                        coords.Add(0);
+                        currentBranch = currentBranch.Childrens[0];
+                    }
+                    else /*if no child*/
+                    {
+                        //are there other childs ?
+                        if (coords[coords.Count - 1] < currentBranch.Childrens.Count)
+                        {
+                            coords[coords.Count - 1]++;
+                        }
+                        else
+                        {
+                            if(coords.Count > 1)
+                            {
+                                coords.RemoveAt(coords.Count - 1);
+                            }
+                            //if there's no other child go up until you find another parent that has childrens
+                            while (true)
+                            {
+                                if(currentBranch.Parent.Childrens.Count < coords[coords.Count - 1])
+                                {
+                                    coords[coords.Count - 1]++;
+                                } 
+                            }
+                        }
+                    }
+
+                    //go up if no child
+                }
+            }
         }
 
         public SyntaxNode PeekCurrent()

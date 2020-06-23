@@ -7,8 +7,8 @@ namespace LangScriptCompilateur
 {
     public class ComparaisonNode : SyntaxNode
     {
-        ValueNode l_op { get; set; }
-        ValueNode r_op { get; set; }
+        public ValueNode l_op { get; set; }
+        public ValueNode r_op { get; set; }
 
         public Signature ComparaisonType { get; set; }
 
