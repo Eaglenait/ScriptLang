@@ -60,6 +60,7 @@ namespace LangScriptCompilateur
             return declNode;
         }
 
+        //TODO add parsed value to a current stack use variables from stack not from returned ValueNode
         private ValueNode ParseValueNode(ref int at)
         {
             var value = new ValueNode();
@@ -224,12 +225,11 @@ namespace LangScriptCompilateur
 
             at++;
 
-            //parse else
+            //mark that else exist
             if(Ast[at].Signature == Signature.KW_ELSE)
             {
-
+                ifNode.HasElse = true;
             }
-
 
             return ifNode;
         }
@@ -436,7 +436,6 @@ namespace LangScriptCompilateur
 
                         if (parsedIfStatement.HasElse)
                         {
-
                         }
                         break;
 

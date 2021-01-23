@@ -5,7 +5,8 @@
         //Return Value
         public VarNode Value { get; set; }
 
-        public ReturnNode(){
+        public ReturnNode()
+        {
             Value = new VarNode();
         }
     }
