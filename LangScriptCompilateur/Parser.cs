@@ -29,35 +29,19 @@ namespace LangScriptCompilateur
         //  Todo add scope validation
         //       test
         /// <summary>
-        /// Search for a declared variable by name
+        /// Search for a declared variable by name in the current block
         /// </summary>
         /// <returns></returns>
         private DeclarationNode SeekVariableDeclarationWithName(string name)
         {
-            var currentCoords = Tree.CurrentNode;
-
-            DeclarationNode declNode = null;
-
-            do
+            foreach (var decl in Tree.VariableStack)
             {
-                //Changes tree coords
-                SyntaxNode parent = Tree.GoCurrentParent();
-                foreach (var child in parent.Childrens)
+                if (decl.Variable.VarName == name)
                 {
-                    if (child is DeclarationNode)
-                    {
-                        var valueChild = child as DeclarationNode;
-                        if (valueChild.Variable.VarName == name)
-                        {
-                            declNode = valueChild;
-                        }
-                    }
+                    return decl;
                 }
-            } while(Tree.CurrentNode.Count > 1);
-
-            //reposition current node
-            Tree.Go(currentCoords.ToArray());
-            return declNode;
+            }
+            return null;
         }
 
         //TODO add parsed value to a current stack use variables from stack not from returned ValueNode
@@ -140,12 +124,10 @@ namespace LangScriptCompilateur
             return value;
         }
 
-        private ReturnNode ParseReturnStatement(ref int at)
+        //TODO check if return type is correct from the function context
+        private bool ParseReturnStatement(ref int at)
         {
-            ReturnNode rNode = new ReturnNode
-            {
-                NodeType = OperationType.RETURN
-            };
+            ReturnNode rNode = new ReturnNode();
 
             //first Signature is return kw second should be return value or ';'
             at++;
@@ -154,21 +136,20 @@ namespace LangScriptCompilateur
             ValueNode returnValue = ParseValueNode(ref at);
             if (returnValue == null)
             {
-                at = 0;
-                return null;
+                return false;
             }
 
             //now signature should be END
             at++;
             if(Ast[at].Signature != Signature.END)
             {
-                at = 0;
-                return null;
+                return false;
             }
 
             //return to next signature
             at++;
-            return rNode;
+            Tree.Current.AddChild(rNode);
+            return true;
         }
 
         //only supports direct comparaison. No result of operation allowed
@@ -202,7 +183,7 @@ namespace LangScriptCompilateur
             return cn;
         }
 
-        private IfNode ParseIfStatement(ref int at)
+        private bool ParseIfStatement(ref int at)
         {
             var ifNode = new IfNode();
             //parse operation
@@ -211,38 +192,80 @@ namespace LangScriptCompilateur
             //Parse op
             if(Ast[at].Signature != Signature.LPAREN)
             {
-                at = 0;
-                return null;
+                return false;
             }
 
             at++;
+            //returns at the position after the second value
             ComparaisonNode cn = ParseComparaisonNode(ref at);
             if (cn == null)
             {
-                at = 0;
-                return null;
+                return false;
+            }
+
+            ifNode.AddComparaisonNode(cn);
+
+            if(Ast[at].Signature != Signature.RPAREN)
+            {
+                return false;
             }
 
             at++;
-
-            //mark that else exist
-            if(Ast[at].Signature == Signature.KW_ELSE)
+            if(Ast[at].Signature != Signature.LBRACE)
             {
-                ifNode.HasElse = true;
+                return false;
             }
 
-            return ifNode;
+            //get bound of the {} block
+            at++;
+            bool closingBraceFound = GoToClosingBrace(ref at);
+            if(closingBraceFound == false)
+            {
+                return false;
+            }
+
+            at++;
+            if (at <= Ast.Count)
+            {
+                if (Ast[at].Signature == Signature.KW_ELSE)
+                {
+                    ifNode.HasElse = true;
+                    ifNode.AddChild(OperationType.BLOCK);
+
+                    at++;
+                    if (Ast[at].Signature != Signature.LBRACE)
+                    {
+                        return false;
+                    }
+
+                    at++;
+                    int currentPos = at;
+
+                    if (!GoToClosingBrace(ref at))
+                    {
+                        return false;
+                    }
+
+                    at = currentPos;
+                }
+            }
+
+            Tree.Current.AddChild(ifNode);
+
+            return true;
         }
+
 
         //todo nullability
         //     type checking
         //     language consts (WORLD,SELF,SCRIPT)
+        //     scope
         /// <summary>
         /// Parses a variable declaration
         /// </summary>
         /// <param name="at">position to start parsing in the ast</param>
         /// <returns>Declaration node</returns>
-        private DeclarationNode ParseVarDeclaration(ref int at)
+        private bool ParseVarDeclaration(ref int at)
         {
             DeclarationNode dNode = new DeclarationNode();
 
@@ -254,8 +277,7 @@ namespace LangScriptCompilateur
 
             if (Ast[at].Signature != Signature.IDENTIFIER)
             {
-                at = 0;
-                return null;
+                return false;
             }
 
             //Search tree for existing declaration
@@ -263,7 +285,7 @@ namespace LangScriptCompilateur
             if(varDecl != null)
             {
                 _logger.LogFatal("Redeclaration of variable");
-                return null;
+                return false;
             }
             dNode.Variable.VarName = Ast[at].Word;
 
@@ -273,8 +295,7 @@ namespace LangScriptCompilateur
             {
                 //not assignation case;
                 _logger.LogFatal("Variable declaration without assignation");
-                at = 0;
-                return null;
+                return false;
             }
 
             //Right side value
@@ -373,26 +394,30 @@ namespace LangScriptCompilateur
                     break;
 
                 default:
-                    at = 0;
-                    return null;
+                    return false;
             }
 
             at++;
 
             if (Ast[at].Signature != Signature.END)
             {
-                at = 0;
-                return null;
+                return false;
             }
 
-            //TODO verify that it returns the correct position
-            return dNode;
+            Tree.Current.AddChild(dNode);
+
+            //TODO not best way of doing that
+            Tree.VariableStack.Add(dNode);
+
+            //TODO check that we return a valid position in the AST
+            return true;
         }
 
+        //TODO: differenciate top level parsing (ie var declaration) and contextual parsing (ie comparaisonNode parsing)
+        //      we have to be able to reuse the contextual parsing while the top level parsing will always be a starting point for parsing
         public void Execute()
         {
             bool badParseFlag = false;
-            int enclosureLevel = 0;
 
             for (int i = 0; i < Ast.Count; i++)
             {
@@ -404,38 +429,44 @@ namespace LangScriptCompilateur
 
                 switch(Ast[i].Signature)
                 {
-                    //TODO drill up or down
-
                     case Signature.TYPENAME:
-                        DeclarationNode parsedVarDeclaration = ParseVarDeclaration(ref i);
-                        if (i == 0)
+                        bool parsedVarDeclarationResult = ParseVarDeclaration(ref i);
+                        if (!parsedVarDeclarationResult)
                         {
                             badParseFlag = true;
                             continue;
                         }
-
-                        Tree.AddChild(parsedVarDeclaration);
                         break;
 
                     case Signature.KW_RETURN:
-                        var parsedReturnStatement = ParseReturnStatement(ref i);
-                        if (i == 0
-                           || parsedReturnStatement == null)
+                        var parsedReturnStatementResult = ParseReturnStatement(ref i);
+                        if (parsedReturnStatementResult)
                         {
                             badParseFlag = true;
                             continue;
                         }
 
-                        Tree.AddChild(parsedReturnStatement);
+                        Tree.Up();
                         break;
 
                     case Signature.KW_IF:
                         //TODO
-                        var parsedIfStatement = ParseIfStatement(ref i);
-                        enclosureLevel++;
-
-                        if (parsedIfStatement.HasElse)
+                        var parsedIfStatementResult = ParseIfStatement(ref i);
+                        if(parsedIfStatementResult)
                         {
+                            badParseFlag = true;
+                            continue;
+                        }
+                        else
+                        {
+                            //Go into the newly added ifNode
+                            Tree.Down(Tree.Current.Childrens.Count - 1);
+                        }
+
+                        if (Tree.Current.HasChildrens)
+                        {
+                            //The third node of a ifNode is the Else block
+                            Tree.Down(3);
                         }
                         break;
 
@@ -453,6 +484,28 @@ namespace LangScriptCompilateur
                 }
             }
         }
+        
+        private bool GoToClosingBrace(ref int at)
+        {
+            bool closingBraceFound = false;
+            int openBraceCount = 1;
+            while(closingBraceFound == false && at <= Ast.Count)
+            {
+                Token current = Ast[at];
+                if (current.Signature == Signature.LBRACE) openBraceCount++;
+                if (current.Signature == Signature.RBRACE) openBraceCount--;
+                if(openBraceCount == 0)
+                {
+                    closingBraceFound = true;
+                    break;
+                }
 
+                if(at + 1 > Ast.Count) break;
+
+                at++;
+            }
+
+            return closingBraceFound;
+        }
     }
 }

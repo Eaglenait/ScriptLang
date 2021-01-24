@@ -32,14 +32,16 @@ namespace ScriptCompilateurTests.ParserTests
             p.Execute();
 
             //peek last
-            DeclarationNode jDeclaration = p.Tree.PeekCurrent() as DeclarationNode;
+            DeclarationNode jDeclaration = p.Tree.TreeRoot.Childrens[1] as DeclarationNode;
 
             int jValue = (int)jDeclaration.Variable.Value;
             //verify that i = j
             Assert.AreEqual(jValue, 0);
+            Assert.IsTrue(p.Tree.VariableStack.Count == 2);
         }
 
         [Test]
+        [Ignore("TODO")]
         public void InvalidConstVarCopyDeclarationTest()
         {
             string script =
@@ -49,7 +51,7 @@ namespace ScriptCompilateurTests.ParserTests
             p.Execute();
 
             //peek last
-            DeclarationNode jDeclaration = p.Tree.PeekCurrent() as DeclarationNode;
+            DeclarationNode jDeclaration = p.Tree.TreeRoot.Childrens[1] as DeclarationNode;
 
             //int jValue = (int)jDeclaration.Variable.Value;
         }

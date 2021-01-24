@@ -14,7 +14,7 @@ namespace ScriptCompilateurTests.ParserTests
             Parser p = ParserTestHelper.GetParserInstanceForScript("return;");
             p.Execute();
 
-            SyntaxNode node = p.Tree.PeekCurrent();
+            SyntaxNode node = p.Tree.TreeRoot.Childrens[0];
 
             Assert.IsTrue(node is ReturnNode);
             var rNode = node as ReturnNode;
@@ -26,7 +26,7 @@ namespace ScriptCompilateurTests.ParserTests
             p = ParserTestHelper.GetParserInstanceForScript("return null;");
             p.Execute();
 
-            node = p.Tree.PeekCurrent();
+            node = p.Tree.TreeRoot.Childrens[0];
 
             Assert.IsTrue(node is ReturnNode);
             rNode = node as ReturnNode;
@@ -42,7 +42,7 @@ namespace ScriptCompilateurTests.ParserTests
             Parser p = ParserTestHelper.GetParserInstanceForScript("return 0;");
             p.Execute();
 
-            SyntaxNode node = p.Tree.PeekCurrent();
+            SyntaxNode node = p.Tree.TreeRoot.Childrens[0];
 
             Assert.IsTrue(node is ReturnNode);
             var rNode = node as ReturnNode;
@@ -55,7 +55,7 @@ namespace ScriptCompilateurTests.ParserTests
             Parser p = ParserTestHelper.GetParserInstanceForScript("return true;");
             p.Execute();
 
-            SyntaxNode node = p.Tree.PeekCurrent();
+            SyntaxNode node = p.Tree.TreeRoot.Childrens[0];
 
             Assert.IsTrue(node is ReturnNode);
             var rNode = node as ReturnNode;
@@ -63,12 +63,14 @@ namespace ScriptCompilateurTests.ParserTests
         }
 
         [Test]
+        [Ignore("TODO")]
         public void ReturnDeclaredVariableTest()
         {
             Parser p = ParserTestHelper.GetParserInstanceForScript("int i = 0; return i;");
             p.Execute();
 
-            SyntaxNode node = p.Tree.PeekCurrent();
-        }
+            SyntaxNode node = p.Tree.TreeRoot.Childrens[0];
+
+       }
     }
 }
