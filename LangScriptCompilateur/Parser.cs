@@ -139,6 +139,8 @@ namespace LangScriptCompilateur
                 return false;
             }
 
+            rNode.Value = new VarNode(returnValue);
+
             //now signature should be END
             at++;
             if(Ast[at].Signature != Signature.END)
@@ -225,7 +227,7 @@ namespace LangScriptCompilateur
             }
 
             at++;
-            if (at <= Ast.Count)
+            if (at < Ast.Count)
             {
                 if (Ast[at].Signature == Signature.KW_ELSE)
                 {
