@@ -8,13 +8,16 @@ namespace LangScriptCompilateur
         -Parent Node
             -IfNode
                 -ComparaisonNode (content of the if)
-                -SyntaxNode
+                -SyntaxNode -> if true exec this code
                 -SyntaxNode of Type Else (if HasElse = true)
-                    ->
+                    -> if false exec this
      */
     public class IfNode : SyntaxNode
     {
         public bool HasElse { get; set; } = false;
+
+        public void AddComparaisonNode(ComparaisonNode node)
+            => Childrens[0] = node;
 
         public IfNode()
         {
@@ -23,9 +26,7 @@ namespace LangScriptCompilateur
             Childrens.Add(new ComparaisonNode());
 
             //If content block
-            Childrens.Add(new SyntaxNode(this) { 
-                NodeType = OperationType.BLOCK,
-            });
+            AddChild(OperationType.BLOCK);
         }
     }
 }

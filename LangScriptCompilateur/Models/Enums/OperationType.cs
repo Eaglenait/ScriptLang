@@ -6,6 +6,7 @@
         PARENT,
         ASSIGNATION,
         DECLARATION,
+        OPERATION,
         RETURN,
         BLOCK,
         IF,

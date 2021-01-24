@@ -14,6 +14,7 @@ namespace LangScriptCompilateur
 
         public ComparaisonNode()
         {
+            NodeType = OperationType.OPERATION;
             l_op = new ValueNode();
             r_op = new ValueNode();
         }

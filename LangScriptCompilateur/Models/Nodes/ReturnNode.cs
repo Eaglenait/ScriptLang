@@ -7,6 +7,7 @@
 
         public ReturnNode()
         {
+            NodeType = Enums.OperationType.RETURN;
             Value = new VarNode();
         }
     }

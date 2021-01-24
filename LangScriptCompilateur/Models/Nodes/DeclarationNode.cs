@@ -10,6 +10,7 @@ namespace LangScriptCompilateur.Models.Nodes
 
         public DeclarationNode()
         {
+            NodeType = Enums.OperationType.DECLARATION;
             Variable = new VarNode();
         }
     }

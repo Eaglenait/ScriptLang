@@ -1,5 +1,6 @@
 ﻿using LangScriptCompilateur.Models;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace LangScriptCompilateur
@@ -10,6 +11,9 @@ namespace LangScriptCompilateur
 
         public void Compile(string script)
         {
+            //Step 1 : take the string script and parse the tokens.
+            //This enables to make a first syntaxic validation to see if the code is even readable or not.
+            //We get a list of tokens that will be parsed into 'instructions'
             var lexer = new Lexer(script);
             lexer.Execute();
 
@@ -28,21 +32,19 @@ namespace LangScriptCompilateur
                 }
             }
 
+            //Step 2: based on the tokens that we got from the lexer we parse them to extract executable instructions
+            //the parsing creates a execution tree. The trees nodes are the instructions. 
             Parser p = new Parser(lexer.Tokens);
             p.Execute();
 
             if(!KompilationLogger.Instance.HasFatal())
             {
-                //go root
-                p.Tree.Go(1);
-
+                Console.WriteLine("No fatal errors");
             }
             else
             {
                 foreach (var log in KompilationLogger.Instance.Log)
-                {
                     Console.WriteLine(string.Format("{0} - {1}", log.Item2, log.Item1));
-                }
             }
             Console.WriteLine("Compile End");
         }
