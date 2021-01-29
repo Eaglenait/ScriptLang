@@ -39,6 +39,7 @@ namespace ScriptLangConsole
             else if(readKey.KeyChar == '2')
             {
                 string path = @"..\scripts\script.sc";
+                Console.WriteLine("Current path:" + path);
                 var fs = new FileStream(path, FileMode.Open);
 
                 string script = "";
