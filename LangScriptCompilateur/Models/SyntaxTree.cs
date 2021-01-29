@@ -70,7 +70,40 @@ namespace LangScriptCompilateur.Models
         /// </summary>
         public IEnumerable<SyntaxNode> IterateAllTree()
         {
-            throw new NotImplementedException();
+            if (!TreeRoot.HasChildrens)
+            {
+                yield return TreeRoot;
+                yield break;
+            }
+
+            Current = TreeRoot.Childrens[0];
+
+            //index of childrens per node level
+            var traversalStack = new Stack<int>();
+
+            while (true)
+            {
+                if(Current.HasChildrens)
+                {
+                    Current = Current.Childrens[0];
+                    traversalStack.Push(0);
+                }
+                else
+                {
+                    int currentChildIndex = traversalStack.Pop();
+
+                    if(Current.Parent == null)
+                        break;
+
+                    //If we have unvisited childrens
+                    if (currentChildIndex < Current.Parent.Childrens.Count - 1)
+                    {
+                        traversalStack.Push(currentChildIndex++);
+                        Current = Current.Parent.Childrens[currentChildIndex];
+                        yield return Current;
+                    }
+                }
+            }
         }
     }
 }
