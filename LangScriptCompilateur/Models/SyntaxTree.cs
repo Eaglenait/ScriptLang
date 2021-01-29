@@ -80,6 +80,7 @@ namespace LangScriptCompilateur.Models
 
             //index of childrens per node level
             var traversalStack = new Stack<int>();
+            traversalStack.Push(0);
 
             while (true)
             {
@@ -90,10 +91,10 @@ namespace LangScriptCompilateur.Models
                 }
                 else
                 {
-                    int currentChildIndex = traversalStack.Pop();
-
-                    if(Current.Parent == null)
+                    if (Current.Parent == null)
                         break;
+
+                    int currentChildIndex = traversalStack.Pop();
 
                     //If we have unvisited childrens
                     if (currentChildIndex < Current.Parent.Childrens.Count - 1)

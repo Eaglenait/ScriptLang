@@ -10,12 +10,9 @@ namespace ScriptLangConsole
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("1 to enter text mode");
-            Console.WriteLine("2 to enter file mode");
-            Console.WriteLine("3 to quit");
-            var readKey = Console.ReadKey();
+            string scriptText = "";
 
-            if(readKey.KeyChar == '1')
+            if(args.Length == 0)
             {
                 List<string> lines = new List<string>();
                 while(true)
@@ -36,22 +33,18 @@ namespace ScriptLangConsole
                     }
                 }
             }
-            else if(readKey.KeyChar == '2')
+            else
             {
-                string path = @"..\scripts\script.sc";
+                string path = args[0];
                 Console.WriteLine("Current path:" + path);
                 var fs = new FileStream(path, FileMode.Open);
 
                 string script = "";
                 using (StreamReader sr = new StreamReader(fs))
                     script = sr.ReadToEnd();
+            }
 
-                new Compilateur().Compile(script);
-            }
-            else
-            {
-                return;        
-            }
+            new Compilateur().Compile(scriptText);
         }
     }
 }

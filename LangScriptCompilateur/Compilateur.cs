@@ -62,7 +62,7 @@ namespace LangScriptCompilateur
                 foreach (var log in KompilationLogger.Instance.Log)
                     Console.WriteLine(string.Format("{0} - {1}", log.Item2, log.Item1));
             }
-            Console.WriteLine("Compile End");
+            Console.WriteLine("Compilation End");
         }
     }
 }
