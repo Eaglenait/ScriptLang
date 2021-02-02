@@ -26,8 +26,7 @@ namespace LangScriptCompilateur.Models
         /// <summary>
         /// Access the parent node
         /// </summary>
-        /// <returns></returns>
-        public SyntaxTree Up()
+        public void Up()
         {
             if(Current.Parent != null)
             {
@@ -39,15 +38,13 @@ namespace LangScriptCompilateur.Models
                 KompilationLogger.Instance.AddLog("SyntaxTree: attempt to go higher than root node", Severity.Warning);
                 Current = TreeRoot;
             }
-            return this;
         }
 
         /// <summary>
         /// Access a child node by index
         /// </summary>
         /// <param name="childIndex">index of the child node</param>
-        /// <returns></returns>
-        public SyntaxTree Down(int childIndex)
+        public void Down(int childIndex)
         {
             if(Current.HasChildrens)
             {
@@ -55,12 +52,10 @@ namespace LangScriptCompilateur.Models
                 if(child != null)
                 {
                     Current = child;
-                    return this;
                 }
             }
 
             KompilationLogger.Instance.AddLog($"SyntaxTree: Attempt to access invalid child at index {childIndex}", Severity.Warning);
-            return null;
         }
 
         /// <summary>
