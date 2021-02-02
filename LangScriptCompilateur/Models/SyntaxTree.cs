@@ -44,7 +44,7 @@ namespace LangScriptCompilateur.Models
         }
 
         /// <summary>
-        /// Access a child node
+        /// Access a child node by index
         /// </summary>
         /// <param name="childIndex">index of the child node</param>
         /// <returns>child node or null if it doesn't exist</returns>
@@ -80,9 +80,8 @@ namespace LangScriptCompilateur.Models
 
             //index of childrens per node level
             var traversalStack = new Stack<int>();
-            traversalStack.Push(0);
 
-            while (true)
+            while (Current.Parent != null)
             {
                 if(Current.HasChildrens)
                 {
@@ -92,7 +91,7 @@ namespace LangScriptCompilateur.Models
                 else
                 {
                     if (Current.Parent == null)
-                        break;
+                        yield break;
 
                     int currentChildIndex = traversalStack.Pop();
 

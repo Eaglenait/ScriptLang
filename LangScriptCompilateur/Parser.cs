@@ -41,6 +41,8 @@ namespace LangScriptCompilateur
                     return decl;
                 }
             }
+
+            KompilationLogger.Instance.AddLog($"The name {name} does not exist in the current context", Severity.Fatal);
             return null;
         }
 
@@ -218,8 +220,9 @@ namespace LangScriptCompilateur
                 return false;
             }
 
-            //get bound of the {} block
+            //get bounds of the {} block
             at++;
+            int startOfIfBlock = at;
             bool closingBraceFound = GoToClosingBrace(ref at);
             if(closingBraceFound == false)
             {
@@ -253,10 +256,10 @@ namespace LangScriptCompilateur
             }
 
             Tree.Current.AddChild(ifNode);
+            at = startOfIfBlock;
 
             return true;
         }
-
 
         //todo nullability
         //     type checking
@@ -420,6 +423,11 @@ namespace LangScriptCompilateur
         public void Execute()
         {
             bool badParseFlag = false;
+            Stack<ParseState> parseState = new Stack<ParseState>();
+            parseState.Push(ParseState.NONE);
+
+            //Root is 0; each time we go down a block we increment;
+            int blockDepth = 0;
 
             for (int i = 0; i < Ast.Count; i++)
             {
@@ -433,7 +441,7 @@ namespace LangScriptCompilateur
                 {
                     case Signature.TYPENAME:
                         bool parsedVarDeclarationResult = ParseVarDeclaration(ref i);
-                        if (!parsedVarDeclarationResult)
+                        if (parsedVarDeclarationResult == false)
                         {
                             badParseFlag = true;
                             continue;
@@ -442,34 +450,40 @@ namespace LangScriptCompilateur
 
                     case Signature.KW_RETURN:
                         var parsedReturnStatementResult = ParseReturnStatement(ref i);
-                        if (parsedReturnStatementResult)
+                        if (parsedReturnStatementResult == false)
                         {
                             badParseFlag = true;
                             continue;
                         }
 
+                        //if we are in a function we have to go up the execution tree until we are not in that function block anymore
+                        //if()
+                        //{
+                            //TODO: go back up the execution tree until function declaration and reposition the "at" at then end of that function
+                            //Also update the blockdepth accordingly;
+                        //}
+
+                        blockDepth--;
                         Tree.Up();
                         break;
 
                     case Signature.KW_IF:
-                        //TODO
+                        //TODO fix parse value
                         var parsedIfStatementResult = ParseIfStatement(ref i);
-                        if(parsedIfStatementResult)
+                        if(parsedIfStatementResult == false)
                         {
                             badParseFlag = true;
                             continue;
                         }
                         else
                         {
+                            blockDepth++;
                             //Go into the newly added ifNode
                             Tree.Down(Tree.Current.Childrens.Count - 1);
+                            //Go into the if node first bracket group
+                            Tree.Down(1);
                         }
 
-                        if (Tree.Current.HasChildrens)
-                        {
-                            //The third node of a ifNode is the Else block
-                            Tree.Down(3);
-                        }
                         break;
 
                     case Signature.CONST_WORLD:
@@ -482,6 +496,11 @@ namespace LangScriptCompilateur
 
                     case Signature.CONST_SELF:
                         //TODO
+                        break;
+
+                    case Signature.RBRACE:
+                        blockDepth--;
+                        Tree.Up();
                         break;
                 }
             }

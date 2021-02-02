@@ -53,9 +53,9 @@ namespace LangScriptCompilateur
             if(!KompilationLogger.Instance.HasFatal())
             {
                 Console.WriteLine("No fatal errors");
-                var nodeStrings = p.Tree.IterateAllTree().Select(e => e.NodeType.ToString());
-                foreach (var str in nodeStrings)
-                    Console.WriteLine(str);
+                //var nodeStrings = p.Tree.IterateAllTree().Select(e => e.NodeType.ToString());
+                //foreach (var str in nodeStrings)
+                //    Console.WriteLine(str);
             }
             else
             {
