@@ -10,6 +10,10 @@ namespace ScriptLangConsole
     {
         static void Main(string[] args)
         {
+#if DEBUG
+            args = new[] { "../scripts/script.sc" };
+#endif
+
             string scriptText = "";
 
             if(args.Length == 0)
@@ -28,7 +32,7 @@ namespace ScriptLangConsole
                         var sb = new StringBuilder();
                         lines.ForEach(a => sb.Append(a));
                         lines.Clear();
-                        new Compilateur().Compile(sb.ToString());
+                        scriptText = sb.ToString();
                         sb.Clear();
                     }
                 }
@@ -36,15 +40,22 @@ namespace ScriptLangConsole
             else
             {
                 string path = args[0];
-                Console.WriteLine("Current path:" + path);
-                var fs = new FileStream(path, FileMode.Open);
+                DirectoryInfo di = new DirectoryInfo(path);
+                Console.WriteLine("Current path:" + di.FullName);
+                    var fs = new FileStream(path, FileMode.Open);
 
-                string script = "";
                 using (StreamReader sr = new StreamReader(fs))
-                    script = sr.ReadToEnd();
+                    scriptText = sr.ReadToEnd();
             }
 
-            new Compilateur().Compile(scriptText);
+            try
+            {
+                new Compilateur().Compile(scriptText);
+            }
+            catch (Exception e)
+            {
+                Console.ReadKey();
+            }
         }
     }
 }
