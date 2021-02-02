@@ -15,6 +15,11 @@ namespace LangScriptCompilateur.Models
             Parent = null,
         };
 
+        public override string ToString()
+        {
+            return $"{NodeType.ToString()}:{GetType().Name}";
+        }
+
         //Root constructor only
         protected SyntaxNode() { }
 
