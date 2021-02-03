@@ -150,8 +150,6 @@ namespace LangScriptCompilateur
                 return false;
             }
 
-            //return to next signature
-            at++;
             Tree.Current.AddChild(rNode);
             return true;
         }
@@ -223,13 +221,13 @@ namespace LangScriptCompilateur
             //get bounds of the {} block
             int startOfIfBlock = at;
             at++;
-            bool closingBraceFound = GoToClosingBrace(at);
-            if(closingBraceFound == false)
+            var closingBraceFound = GoToClosingBrace(at);
+            if(closingBraceFound.Item1 == false)
             {
                 return false;
             }
 
-            int startOfElseBlock = at;
+            int startOfElseBlock = closingBraceFound.Item2;
             startOfElseBlock++;
             if (startOfElseBlock < Ast.Count)
             {
@@ -246,7 +244,7 @@ namespace LangScriptCompilateur
 
                     startOfElseBlock++;
 
-                    if (!GoToClosingBrace(startOfElseBlock))
+                    if (!GoToClosingBrace(startOfElseBlock).Item1)
                     {
                         return false;
                     }
@@ -478,7 +476,7 @@ namespace LangScriptCompilateur
                         blockDepth++;
                         parseState.Push(ParseState.IN_ELSE_BLOCK);
                         //Go into the "else" subnode
-                        Tree.Down(3);
+                        Tree.Down(2);
                         break;
 
                     case Signature.CONST_WORLD:
@@ -502,7 +500,7 @@ namespace LangScriptCompilateur
             }
         }
         
-        private bool GoToClosingBrace(int at)
+        private (bool, int) GoToClosingBrace(int at)
         {
             bool closingBraceFound = false;
             int openBraceCount = 1;
@@ -522,7 +520,7 @@ namespace LangScriptCompilateur
                 at++;
             }
 
-            return closingBraceFound;
+            return (closingBraceFound, at);
         }
     }
 }
