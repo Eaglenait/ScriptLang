@@ -32,7 +32,7 @@ namespace LangScriptCompilateur
         /// Search for a declared variable by name in the current block
         /// </summary>
         /// <returns></returns>
-        private DeclarationNode SeekVariableDeclarationWithName(string name)
+        private DeclarationNode SeekVariableDeclarationWithName(string name, bool isDeclaration = false)
         {
             foreach (var decl in Tree.VariableStack)
             {
@@ -42,7 +42,8 @@ namespace LangScriptCompilateur
                 }
             }
 
-            KompilationLogger.Instance.AddLog($"The name {name} does not exist in the current context", Severity.Fatal);
+            if(isDeclaration == false)
+                KompilationLogger.Instance.AddLog($"The name {name} does not exist in the current context", Severity.Fatal);
             return null;
         }
 
@@ -282,7 +283,7 @@ namespace LangScriptCompilateur
             }
 
             //Search tree for existing declaration
-            var varDecl = SeekVariableDeclarationWithName(Ast[at].Word);
+            var varDecl = SeekVariableDeclarationWithName(Ast[at].Word, true);
             if(varDecl != null)
             {
                 _logger.LogFatal("Redeclaration of variable");
