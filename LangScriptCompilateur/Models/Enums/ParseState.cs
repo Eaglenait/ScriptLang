@@ -2,14 +2,14 @@
 
 namespace LangScriptCompilateur.Models.Enums
 {
-    [Flags]
-    public enum ParseState : uint
+    public enum ParseState
     {
-        NONE = 0,
-        IN_IF_BLOCK = 1,
-        IN_ELSE_BLOCK = 2,
-        IN_FUNCTION_BLOCK = 4,
-        IN_FOR_BLOCK = 8,
-        IN_WHILE_BLOCK = 16,
+        NONE,
+        IN_IF_BLOCK,
+        IN_ELSE_BLOCK,
+        IN_FUNCTION_BLOCK,
+        IN_FOR_BLOCK,
+        IN_WHILE_BLOCK,
+        IN_FUNC_DECL_BLOCK,
     }
 }

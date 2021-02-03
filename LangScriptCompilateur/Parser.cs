@@ -475,8 +475,27 @@ namespace LangScriptCompilateur
                     case Signature.KW_ELSE:
                         blockDepth++;
                         parseState.Push(ParseState.IN_ELSE_BLOCK);
+                        blockDepth++;
                         //Go into the "else" subnode
                         Tree.Down(2);
+                        break;
+
+                    case Signature.KW_WHILE:
+                        parseState.Push(ParseState.IN_WHILE_BLOCK);
+                        blockDepth++;
+                        //TODO
+                        break;
+
+                    case Signature.KW_FOR:
+                        parseState.Push(ParseState.IN_FOR_BLOCK);
+                        blockDepth++;
+                        //TODO
+                        break;
+
+                    case Signature.KW_FUNCTION_DECL:
+                        parseState.Push(ParseState.IN_FUNC_DECL_BLOCK);
+                        blockDepth++;
+                        //TODO
                         break;
 
                     case Signature.CONST_WORLD:
