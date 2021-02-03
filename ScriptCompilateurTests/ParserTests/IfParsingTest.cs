@@ -1,6 +1,7 @@
 ﻿using LangScriptCompilateur;
 using LangScriptCompilateur.Models;
 using LangScriptCompilateur.Models.Enums;
+using LangScriptCompilateur.Models.Nodes;
 using NUnit.Framework;
 using System.Linq;
 
@@ -67,12 +68,26 @@ namespace ScriptCompilateurTests.ParserTests
 
             p.Execute();
 
-            IfNode ifnode = p.Tree.TreeRoot.Childrens[0] as IfNode;
+            var root = p.Tree;
+            root.GoRoot();
 
-            //main block
-            Assert.IsTrue(ifnode.Childrens[1].HasChildrens);
-            //else block
-            Assert.IsTrue(ifnode.Childrens[2].HasChildrens);
+            //from parent to ifnode
+            root.Down(0);
+
+            //from Ifnode to if block
+            root.Down(1);
+            Assert.IsTrue(root.Current.NodeType == OperationType.BLOCK);
+            Assert.IsTrue(root.Current.HasChildrens);
+            var returnNode = root.Current.Childrens[0] as ReturnNode;
+            Assert.IsTrue((int)returnNode.Value.Value == 0);
+
+            //Back up to ifnode and down to else block
+            root.Up();
+            root.Down(2);
+            Assert.IsTrue(root.Current.NodeType == OperationType.BLOCK);
+            Assert.IsTrue(root.Current.HasChildrens);
+            returnNode = root.Current.Childrens[0] as ReturnNode;
+            Assert.IsTrue((int)returnNode.Value.Value == 1);
         }
     }
 }
