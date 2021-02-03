@@ -21,7 +21,7 @@ namespace LangScriptCompilateur
 
         public IfNode()
         {
-            base.NodeType = OperationType.IF;
+            NodeType = OperationType.IF;
             //if comparaison operation
             Childrens.Add(new ComparaisonNode());
 

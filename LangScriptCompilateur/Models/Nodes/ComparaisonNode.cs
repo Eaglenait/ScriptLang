@@ -89,5 +89,13 @@ namespace LangScriptCompilateur
 
             throw new Exception("Incompatible types");
         }
+
+        #region override
+        public override void AddChild(SyntaxNode child)
+            => throw new System.Exception("Can't add child to this");
+
+        public override void AddChild(OperationType nodeType)
+            => AddChild(nodeType);
+        #endregion
     }
 }

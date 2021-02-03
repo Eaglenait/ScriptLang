@@ -21,7 +21,6 @@ namespace LangScriptCompilateur.Models
             Current = TreeRoot;
             VariableStack = new List<DeclarationNode>();
         }
-        int GoRootParentAccess { get; set; }
 
         /// <summary>
         /// Access the parent node
@@ -57,6 +56,16 @@ namespace LangScriptCompilateur.Models
 
             KompilationLogger.Instance.AddLog($"SyntaxTree: Attempt to access invalid child at index {childIndex}", Severity.Warning);
         }
+
+        /// <summary>
+        /// Access the last child
+        /// </summary>
+        public void DownLast()
+        {
+            int idx = Current.Childrens.Count - 1;
+            Down(idx);
+        }
+
 
         /// <summary>
         /// Goes through all the nodes in the tree

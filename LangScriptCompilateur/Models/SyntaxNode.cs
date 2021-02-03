@@ -48,13 +48,13 @@ namespace LangScriptCompilateur.Models
             }
         }
 
-        public void AddChild(SyntaxNode child)
+        public virtual void AddChild(SyntaxNode child)
         {
             child.Parent = this;
             Childrens.Add(child);
         }
 
-        public void AddChild(OperationType nodeType)
+        public virtual void AddChild(OperationType nodeType)
             => AddChild(new SyntaxNode(nodeType));
     }
 }
