@@ -221,37 +221,35 @@ namespace LangScriptCompilateur
             }
 
             //get bounds of the {} block
-            at++;
             int startOfIfBlock = at;
-            bool closingBraceFound = GoToClosingBrace(ref at);
+            at++;
+            bool closingBraceFound = GoToClosingBrace(at);
             if(closingBraceFound == false)
             {
                 return false;
             }
 
-            at++;
-            if (at < Ast.Count)
+            int startOfElseBlock = at;
+            startOfElseBlock++;
+            if (startOfElseBlock < Ast.Count)
             {
-                if (Ast[at].Signature == Signature.KW_ELSE)
+                if (Ast[startOfElseBlock].Signature == Signature.KW_ELSE)
                 {
                     ifNode.HasElse = true;
                     ifNode.AddChild(OperationType.BLOCK);
 
-                    at++;
-                    if (Ast[at].Signature != Signature.LBRACE)
+                    startOfElseBlock++;
+                    if (Ast[startOfElseBlock].Signature != Signature.LBRACE)
                     {
                         return false;
                     }
 
-                    at++;
-                    int currentPos = at;
+                    startOfElseBlock++;
 
-                    if (!GoToClosingBrace(ref at))
+                    if (!GoToClosingBrace(startOfElseBlock))
                     {
                         return false;
                     }
-
-                    at = currentPos;
                 }
             }
 
@@ -455,16 +453,6 @@ namespace LangScriptCompilateur
                             badParseFlag = true;
                             continue;
                         }
-
-                        //if we are in a function we have to go up the execution tree until we are not in that function block anymore
-                        //if()
-                        //{
-                            //TODO: go back up the execution tree until function declaration and reposition the "at" at then end of that function
-                            //Also update the blockdepth accordingly;
-                        //}
-
-                        blockDepth--;
-                        Tree.Up();
                         break;
 
                     case Signature.KW_IF:
@@ -477,13 +465,20 @@ namespace LangScriptCompilateur
                         }
                         else
                         {
+                            parseState.Push(ParseState.IN_IF_BLOCK);
                             blockDepth++;
                             //Go into the newly added ifNode
-                            Tree.Down(Tree.Current.Childrens.Count - 1);
+                            Tree.DownLast();
                             //Go into the if node first bracket group
                             Tree.Down(1);
                         }
+                        break;
 
+                    case Signature.KW_ELSE:
+                        blockDepth++;
+                        parseState.Push(ParseState.IN_ELSE_BLOCK);
+                        //Go into the "else" subnode
+                        Tree.Down(3);
                         break;
 
                     case Signature.CONST_WORLD:
@@ -500,13 +495,14 @@ namespace LangScriptCompilateur
 
                     case Signature.RBRACE:
                         blockDepth--;
+                        parseState.Pop();
                         Tree.Up();
                         break;
                 }
             }
         }
         
-        private bool GoToClosingBrace(ref int at)
+        private bool GoToClosingBrace(int at)
         {
             bool closingBraceFound = false;
             int openBraceCount = 1;
