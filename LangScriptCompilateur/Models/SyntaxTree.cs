@@ -22,6 +22,11 @@ namespace LangScriptCompilateur.Models
             VariableStack = new List<DeclarationNode>();
         }
 
+        public void GoRoot()
+        {
+            Current = TreeRoot;
+        }
+
         /// <summary>
         /// Access the parent node
         /// </summary>
@@ -45,7 +50,7 @@ namespace LangScriptCompilateur.Models
         /// <param name="childIndex">index of the child node</param>
         public void Down(int childIndex)
         {
-            if(Current.HasChildrens)
+            if(Current.HasChildrens && childIndex < Current.Childrens.Count)
             {
                 var child = Current.Childrens.ElementAtOrDefault(childIndex);
                 if(child != null)
@@ -53,8 +58,11 @@ namespace LangScriptCompilateur.Models
                     Current = child;
                 }
             }
-
-            KompilationLogger.Instance.AddLog($"SyntaxTree: Attempt to access invalid child at index {childIndex}", Severity.Warning);
+            else
+            {
+                KompilationLogger.Instance.AddLog($"SyntaxTree: Attempt to access invalid child at index {childIndex}", Severity.Warning);
+                throw new Exception("Invalid child access");
+            }
         }
 
         /// <summary>
