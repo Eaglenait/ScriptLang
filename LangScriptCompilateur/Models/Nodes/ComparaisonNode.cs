@@ -5,18 +5,18 @@ using LangScriptCompilateur.Models.Nodes;
 
 namespace LangScriptCompilateur
 {
-    public class ComparaisonNode : SyntaxNode
+    public class OperationNode : SyntaxNode
     {
         public ValueNode l_op { get; set; }
         public ValueNode r_op { get; set; }
 
         public Signature ComparaisonType { get; set; }
 
-        public ComparaisonNode()
+        public OperationNode()
         {
             NodeType = OperationType.OPERATION;
-            l_op = new ValueNode();
-            r_op = new ValueNode();
+            l_op = new SyntaxNode();
+            r_op = new SyntaxNode();
         }
 
         public bool Result()

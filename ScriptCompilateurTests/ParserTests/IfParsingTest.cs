@@ -21,7 +21,7 @@ namespace ScriptCompilateurTests.ParserTests
             Assert.IsFalse(ifNode.HasElse);
             Assert.AreEqual(ifNode.Childrens.Count, 2);
 
-            Assert.IsTrue(ifNode.Childrens[0] is ComparaisonNode);
+            Assert.IsTrue(ifNode.Childrens[0] is OperationNode);
             Assert.IsTrue(ifNode.Childrens[1].NodeType == OperationType.BLOCK);
         }
 
@@ -39,7 +39,7 @@ namespace ScriptCompilateurTests.ParserTests
             Assert.IsTrue(ifNode.HasElse);
             Assert.AreEqual(ifNode.Childrens.Count, 3);
 
-            Assert.IsTrue(ifNode.Childrens[0] is ComparaisonNode);
+            Assert.IsTrue(ifNode.Childrens[0] is OperationNode);
             Assert.IsTrue(ifNode.Childrens[1].NodeType == OperationType.BLOCK);
             Assert.IsTrue(ifNode.Childrens[2].NodeType == OperationType.BLOCK);
         }

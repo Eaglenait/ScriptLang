@@ -157,9 +157,9 @@ namespace LangScriptCompilateur
 
         //only supports direct comparaison. No result of operation allowed
         //TODO combinator (&& ||)
-        private ComparaisonNode ParseComparaisonNode(ref int at)
+        private OperationNode ParseOperationNode(ref int at)
         {
-            ComparaisonNode cn = new ComparaisonNode();
+            OperationNode cn = new OperationNode();
 
             var l_val = ParseValueNode(ref at);
 
@@ -200,13 +200,13 @@ namespace LangScriptCompilateur
 
             at++;
             //returns at the position after the second value
-            ComparaisonNode cn = ParseComparaisonNode(ref at);
+            OperationNode cn = ParseOperationNode(ref at);
             if (cn == null)
             {
                 return false;
             }
 
-            ifNode.AddComparaisonNode(cn);
+            ifNode.AddOperationNode(cn);
 
             if(Ast[at].Signature != Signature.RPAREN)
             {
@@ -415,7 +415,7 @@ namespace LangScriptCompilateur
             return true;
         }
 
-        //TODO: differenciate top level parsing (ie var declaration) and contextual parsing (ie comparaisonNode parsing)
+        //TODO: differenciate top level parsing (ie var declaration) and contextual parsing (ie OperationNode parsing)
         //      we have to be able to reuse the contextual parsing while the top level parsing will always be a starting point for parsing
         public void Execute()
         {
