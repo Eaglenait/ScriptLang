@@ -35,21 +35,28 @@ namespace LangScriptCompilateur
     1 + 2 - 3
     
     -l_op:1
+     parent = null
      type:+
      r_op:
         -l_op:2
          type:-
+         parent = (l_op:1 type:+)
          r_op:
             -l_op:3
              type:none
+             parent = (l_op:2 type:-)
              r_op:null
 
     Etape 1 :
         while(r_op != null)
             current = r_op;
     Etape 2 :
-        //Todo déterminer comment remonter
-        while(
+        //vérifier
+        do
+            current = parent
+            current.l_op = current.l_op [operation] child.l_op (r_op)
+        while(current.parent != null)
+
      */
     public class OperationNode : SyntaxNode, VarNode
     {
