@@ -5,18 +5,62 @@ using LangScriptCompilateur.Models.Nodes;
 
 namespace LangScriptCompilateur
 {
-    public class OperationNode : SyntaxNode
+    /*
+      l_op toujours ValueNode
+      nodes autorisés pour r_op
+        OperationNode
+        VarNode -> pas super propre si c'est une operation que avec des const literaux mais pas le choix
+                   sinon on peut pas avoir d'opérations ou l'on fait référence à d'autres variables
+
+    A partir de r_op on peut créer un arbre d'opérations binaires dont chaque résultat est repris
+    par l'opération suivante (parente). Lorsque on arrive au dernier parent de l'opération on a le
+    résultat de tout le calcul
+
+    Comment get la valeur finale d'un arbre OperationNode ?
+    l_op = current l_op [operation] (child l_op value r_op)
+    En pseudo
+        aller au plus profond des r_op
+        quand au dernier
+            l_op = l_op [operation] r_op
+        
+        while parent is OperationNode
+            current = parent
+            l_op = l_op [operation] child.l_op
+
+        return l_op;
+        
+        return l_op [operation] r_op
+    
+    
+    1 + 2 - 3
+    
+    -l_op:1
+     type:+
+     r_op:
+        -l_op:2
+         type:-
+         r_op:
+            -l_op:3
+             type:none
+             r_op:null
+
+    Etape 1 :
+        while(r_op != null)
+            current = r_op;
+    Etape 2 :
+        //Todo déterminer comment remonter
+        while(
+     */
+    public class OperationNode : SyntaxNode, VarNode
     {
         public ValueNode l_op { get; set; }
-        public ValueNode r_op { get; set; }
+        public OperationNode r_op { get; set; }
 
         public Signature ComparaisonType { get; set; }
 
         public OperationNode()
         {
             NodeType = OperationType.OPERATION;
-            l_op = new SyntaxNode();
-            r_op = new SyntaxNode();
         }
 
         public bool Result()
@@ -92,7 +136,8 @@ namespace LangScriptCompilateur
 
         #region override
         public override void AddChild(SyntaxNode child)
-            => throw new System.Exception("Can't add child to this");
+        {
+        }
 
         public override void AddChild(OperationType nodeType)
             => AddChild(nodeType);
